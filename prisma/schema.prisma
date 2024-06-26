@@ -8,8 +8,12 @@ datasource db {
 }
 
 model auth_code {
-  id        Int     @id @default(autoincrement())
-  auth_code String? @db.VarChar(255)
+  id         Int         @id @default(autoincrement())
+  auth_code  String?     @db.VarChar(255)
+  role       Int?
+  auth_roles auth_roles? @relation(fields: [role], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "id_role_id")
+
+  @@index([role], map: "id_role_id")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -34,4 +38,11 @@ model user_type {
   id        Int     @id @default(autoincrement())
   type_name String? @db.VarChar(255)
   users     users[]
+}
+
+model auth_roles {
+  id         Int         @id @default(autoincrement())
+  role_name  String?     @db.VarChar(255)
+  role_level Int?        @db.SmallInt
+  auth_code  auth_code[]
 }
