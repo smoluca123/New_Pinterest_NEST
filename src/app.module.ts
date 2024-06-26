@@ -10,6 +10,8 @@ import { JwtConfigService } from './jwt/jwt-config.service';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './resources/auth/auth.module';
+import { MediaModule } from './resources/media/media.module';
+import { UserModule } from './resources/user/user.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { AuthModule } from './resources/auth/auth.module';
     ThrottlerModule.forRoot([{ ttl: 2000, limit: 100 }]),
     PrismaModule,
     AuthModule,
+    UserModule,
+    MediaModule,
   ],
   controllers: [AppController],
   providers: [
