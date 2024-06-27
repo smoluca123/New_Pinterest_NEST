@@ -17,6 +17,7 @@ import {
   ApiHeader,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { UserInfoUpdateDto, UserUpdateDto } from './dto/UserUpdate.dto';
@@ -43,11 +44,23 @@ export class UserController {
     description: 'Get list of users',
   })
   @ApiQueryLimitAndPage()
+  @ApiQuery({
+    name: 'keyword',
+    description: 'Search by keyword',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'type',
+    description: 'Search by type',
+    required: false,
+  })
   getListUsers(
     @Query('limit') limit: string | number,
     @Query('page') page: string | number,
+    @Query('keyword') keyword: string,
+    @Query('type') type: string,
   ): Promise<IResponseType> {
-    return this.userService.getListUsers(+limit, +page);
+    return this.userService.getListUsers(+limit, +page, keyword, type);
   }
 
   @Get('/infomation')
