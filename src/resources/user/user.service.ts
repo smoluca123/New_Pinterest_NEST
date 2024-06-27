@@ -23,12 +23,28 @@ export class UserService {
   async getListUsers(
     limit: string | number,
     page: string | number,
+    keyword: string,
+    type: string | number,
   ): Promise<IResponseType> {
     try {
       limit = limit ? +limit : 3;
       page = page ? +page : 1;
 
+      const whereQuery = {
+        AND: [
+          {
+            OR: [
+              { username: { contains: keyword } },
+              { email: { contains: keyword } },
+            ],
+          },
+          {
+            type: type ? +type : undefined,
+          },
+        ],
+      };
       const listUsers = await this.prisma.users.findMany({
+        where: whereQuery,
         select: {
           id: true,
           username: true,
@@ -44,7 +60,7 @@ export class UserService {
         skip: (page - 1) * limit,
       });
 
-      const totalItems = await this.prisma.users.count();
+      const totalItems = await this.prisma.users.count({ where: whereQuery });
 
       return {
         message: 'Get list users successfully!',
