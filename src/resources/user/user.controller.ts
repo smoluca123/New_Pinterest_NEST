@@ -38,7 +38,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/list-users')
-  @UseGuards(JwtTokenVerifyGuard)
   @ApiOperation({
     summary: 'User List API',
     description: 'Get list of users',
