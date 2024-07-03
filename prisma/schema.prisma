@@ -16,6 +16,56 @@ model auth_code {
   @@index([role], map: "id_role_id")
 }
 
+model auth_roles {
+  id         Int         @id @default(autoincrement())
+  role_name  String?     @db.VarChar(255)
+  role_level Int?        @db.SmallInt
+  auth_code  auth_code[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model categories {
+  id             Int     @id @default(autoincrement())
+  categorie_name String? @db.VarChar(255)
+  categorie_desc String? @db.VarChar(500)
+  is_hidden      Int?
+}
+
+model image {
+  id         Int       @id @default(autoincrement())
+  img_name   String?   @db.VarChar(255)
+  url        String?   @db.VarChar(500)
+  media_id   Int?
+  created_at DateTime? @db.DateTime(0)
+  media      media?    @relation(fields: [media_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "id_media_id")
+
+  @@index([media_id], map: "id_media_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model media {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(255)
+  slug        String     @default("") @db.VarChar(255)
+  creator_id  Int?
+  description String?    @db.VarChar(500)
+  type        media_type @default(Ungroup)
+  created_at  DateTime?  @db.DateTime(0)
+  updated_at  DateTime?  @db.DateTime(0)
+  is_hidden   Int?
+  image       image[]
+  users       users?     @relation(fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "creatorId_user_id")
+
+  @@index([creator_id], map: "creatorId_user_id")
+  @@index([id], map: "id")
+}
+
+model user_type {
+  id        Int     @id @default(autoincrement())
+  type_name String? @db.VarChar(255)
+  users     users[]
+}
+
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model users {
   id            Int       @id @default(autoincrement())
@@ -29,20 +79,14 @@ model users {
   updated_at    DateTime? @db.DateTime(0)
   is_ban        Int       @default(0)
   refresh_token String?   @db.VarChar(255)
+  is_hidden     Int       @default(0)
+  media         media[]
   user_type     user_type @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "type_usertypes")
 
   @@index([type], map: "type_usertypes")
 }
 
-model user_type {
-  id        Int     @id @default(autoincrement())
-  type_name String? @db.VarChar(255)
-  users     users[]
-}
-
-model auth_roles {
-  id         Int         @id @default(autoincrement())
-  role_name  String?     @db.VarChar(255)
-  role_level Int?        @db.SmallInt
-  auth_code  auth_code[]
+enum media_type {
+  Group
+  Ungroup
 }

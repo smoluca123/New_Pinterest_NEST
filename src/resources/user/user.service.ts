@@ -1,10 +1,15 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { handleDefaultError } from 'src/global/functions.global';
-import { UserInfoUpdateDto, UserUpdateDto } from './dto/UserUpdate.dto';
+import {
+  UserBanDto,
+  UserInfoUpdateDto,
+  UserUpdateDto,
+} from './dto/UserUpdate.dto';
 import {
   IDecodedAccecssTokenType,
   IResponseType,
@@ -104,6 +109,37 @@ export class UserService {
     }
   }
 
+  async getInfomationByID(userId: number): Promise<IResponseType> {
+    try {
+      if (!userId) throw new BadRequestException('User ID is required!');
+
+      const userInfo = await this.prisma.users.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          user_type: true,
+        },
+      });
+
+      if (!userInfo) throw new NotFoundException('User not found!');
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { type, is_ban, password, refresh_token, ...userResult } = userInfo;
+
+      return {
+        message: 'Get user infomation successfully!',
+        statusCode: 200,
+        data: {
+          ...userResult,
+        },
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
   async refreshToken(accessToken: string): Promise<IResponseType> {
     try {
       const { id, username, key } = this.jwt.verify<IDecodedAccecssTokenType>(
@@ -171,6 +207,45 @@ export class UserService {
       ) {
         throw new UnauthorizedException('Access token is expired or invalid');
       }
+      handleDefaultError(error);
+    }
+  }
+
+  async banUser(userId: number, data: UserBanDto): Promise<IResponseType> {
+    try {
+      if (!userId) throw new BadRequestException('User ID is required!');
+      const user = await this.prisma.users.findUnique({
+        where: {
+          id: userId,
+        },
+        include: {
+          user_type: true,
+        },
+      });
+      if (!user) throw new NotFoundException('User not found!');
+
+      if (data.is_ban !== user.is_ban) {
+        await this.prisma.users.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            is_ban: data.is_ban,
+          },
+        });
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, refresh_token, type, ...userResult } = user;
+      return {
+        message: 'Ban user successfully!',
+        statusCode: 200,
+        data: {
+          ...userResult,
+          is_ban: data.is_ban,
+        },
+        date: new Date(),
+      };
+    } catch (error) {
       handleDefaultError(error);
     }
   }
@@ -323,6 +398,39 @@ export class UserService {
         message: 'Update user successfully!',
         statusCode: 200,
         data: { ...userResult, accessToken },
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async deleteUser(userId: number): Promise<IResponseType> {
+    try {
+      if (!userId) throw new BadRequestException('User ID is required!');
+      const user = await this.prisma.users.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user || user.is_hidden)
+        throw new NotFoundException('User not found!');
+
+      await this.prisma.users.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          username: `${new Date().getTime()}_${user.username}`,
+          email: `${new Date().getTime()}_${user.email}`,
+          is_hidden: 1,
+        },
+      });
+
+      return {
+        message: 'Delete user successfully!',
+        statusCode: 200,
+        data: null,
         date: new Date(),
       };
     } catch (error) {

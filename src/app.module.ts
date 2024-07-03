@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './resources/auth/auth.module';
 import { MediaModule } from './resources/media/media.module';
 import { UserModule } from './resources/user/user.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 @Module({
   imports: [
@@ -23,6 +24,9 @@ import { UserModule } from './resources/user/user.module';
       global: true,
       imports: [ConfigModule],
       useClass: JwtConfigService,
+    }),
+    MulterModule.register({
+      dest: './uploads',
     }),
     ThrottlerModule.forRoot([{ ttl: 2000, limit: 100 }]),
     PrismaModule,

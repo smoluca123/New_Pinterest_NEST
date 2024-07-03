@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Param,
+  Post,
   Put,
   Query,
   Req,
@@ -20,7 +22,11 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserInfoUpdateDto, UserUpdateDto } from './dto/UserUpdate.dto';
+import {
+  UserBanDto,
+  UserInfoUpdateDto,
+  UserUpdateDto,
+} from './dto/UserUpdate.dto';
 import {
   IRequestWithDecodedAccessToken,
   IResponseType,
@@ -81,6 +87,21 @@ export class UserController {
     return this.userService.getInfomation(decodedAccessToken);
   }
 
+  @Get('/infomation/:id')
+  @ApiOperation({
+    summary: 'User Infomation API',
+    description: 'Get current user infomation',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+  })
+  getInfomationByID(
+    @Param('id') userId: string | number,
+  ): Promise<IResponseType> {
+    return this.userService.getInfomationByID(+userId);
+  }
+
   @Get('/refresh-token')
   @ApiHeader({
     name: 'accessToken',
@@ -95,6 +116,23 @@ export class UserController {
     @Headers('accessToken') accessToken: string,
   ): Promise<IResponseType> {
     return this.userService.refreshToken(accessToken);
+  }
+
+  @Post('/ban-user/:id')
+  @Roles([RolesLevel.ADMIN])
+  @ApiOperation({
+    summary: 'User Ban API (Admin Only)',
+    description: 'Ban user',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+  })
+  postBanUser(
+    @Param('id') userId: string | number,
+    @Body() data: UserBanDto,
+  ): Promise<IResponseType> {
+    return this.userService.banUser(+userId, data);
   }
 
   @Put('/update-info')
@@ -117,7 +155,7 @@ export class UserController {
     return this.userService.updateInfo(decodedAccessToken, userInfo);
   }
 
-  @Put('/update-user/:id')
+  @Put('/update-info/:id')
   @Roles([RolesLevel.ADMIN])
   @ApiOperation({
     summary: 'User Update API (Admin Only)',
@@ -133,5 +171,19 @@ export class UserController {
     @Body() userInfo: UserUpdateDto,
   ): Promise<IResponseType> {
     return this.userService.updateUser(+userId, userInfo);
+  }
+
+  @Delete('/delete-user/:id')
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+  })
+  @Roles([RolesLevel.ADMIN])
+  @ApiOperation({
+    summary: 'User Delete API (Admin Only)',
+    description: 'Delete user',
+  })
+  deleteUser(@Param('id') userId: string | number): Promise<IResponseType> {
+    return this.userService.deleteUser(+userId);
   }
 }
