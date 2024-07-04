@@ -44,3 +44,9 @@ export class UserUpdateDto {
   })
   is_ban?: 0 | 1;
 }
+
+export class UserBanDto {
+  @ApiProperty({ description: '0: Active, 1: Banned' })
+  @IsIn([0, 1])
+  is_ban: 0 | 1;
+}
