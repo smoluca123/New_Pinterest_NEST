@@ -52,7 +52,7 @@ export class JwtTokenVerifyGuard implements CanActivate {
         'Invalid access token or has been modified',
       );
 
-    const user = await this.prismaService.users.findUnique({
+    const user = await this.prismaService.user.findUnique({
       where: {
         id: decodedAccessToken.id,
         username: decodedAccessToken.username,
