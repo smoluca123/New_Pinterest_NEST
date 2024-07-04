@@ -24,6 +24,7 @@ import {
   ApiConsumes,
   ApiHeader,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { MediaUploadDto } from './dto/MediaUpload.dto';
@@ -46,6 +47,7 @@ export class MediaController {
     description: 'Get list of media',
   })
   @ApiQueryLimitAndPage()
+  @ApiQuery({ name: 'keyword', required: false })
   getMediaList(
     @Query('limit') limit: string | number,
     @Query('page') page: string | number,
