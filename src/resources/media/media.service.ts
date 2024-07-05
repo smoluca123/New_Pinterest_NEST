@@ -11,6 +11,7 @@ import { MediaUploadDto } from './dto/MediaUpload.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import slugify from 'slugify';
 import { SupabaseService } from 'src/supabase/supabase.service';
+import { CreateCommentDto } from './dto/CreateComment.dto';
 
 @Injectable()
 export class MediaService {
@@ -165,6 +166,123 @@ export class MediaService {
         message: 'Get Media Detail Success',
         data: { ...restMediaResult },
         statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async getComments(mediaId: number, replyTo: number): Promise<IResponseType> {
+    try {
+      if (!mediaId) throw new NotFoundException('Media ID is required');
+
+      const comments = await this.prisma.comment.findMany({
+        where: {
+          media_id: mediaId,
+          AND: [
+            {
+              OR: [
+                {
+                  reply_to: replyTo || undefined,
+                },
+              ],
+            },
+          ],
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              age: true,
+              avatar: true,
+              user_type: true,
+              created_at: true,
+              updated_at: true,
+              is_ban: true,
+            },
+          },
+        },
+      });
+
+      return {
+        message: 'Get Comments Success',
+        data: comments,
+        statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async createComment(
+    decodedAccessToken: IDecodedAccecssTokenType,
+    mediaId: number,
+    commentData: CreateCommentDto,
+  ): Promise<IResponseType> {
+    try {
+      if (!mediaId) throw new NotFoundException('Media ID is required');
+
+      const { id: userId } = decodedAccessToken;
+      const { content, replyToCommentId } = commentData;
+
+      let commentCreateData = {};
+      console.log(replyToCommentId);
+      if (replyToCommentId) {
+        const replyComment = await this.prisma.comment.findUnique({
+          where: {
+            id: replyToCommentId,
+            media_id: mediaId,
+          },
+        });
+        if (!replyComment)
+          throw new NotFoundException('Reply Comment not found');
+        commentCreateData = {
+          content,
+          user_id: +userId,
+          media_id: mediaId,
+          level: replyComment.level < 4 ? replyComment.level + 1 : 4, //Max level : 4
+          created_at: new Date(),
+          updated_at: new Date(),
+          reply_to: replyToCommentId,
+        };
+      } else {
+        commentCreateData = {
+          content,
+          user_id: +userId,
+          media_id: mediaId,
+          level: 0,
+          created_at: new Date(),
+          updated_at: new Date(),
+        };
+      }
+
+      const comment = await this.prisma.comment.create({
+        data: commentCreateData,
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              age: true,
+              avatar: true,
+              user_type: true,
+              created_at: true,
+              updated_at: true,
+              is_ban: true,
+            },
+          },
+        },
+      });
+
+      return {
+        message: 'Create Comment Success',
+        data: comment,
+        statusCode: 201,
         date: new Date(),
       };
     } catch (error) {

@@ -35,6 +35,7 @@ import { JwtTokenVerifyGuard } from 'src/guards/jwt-token-verify.guard';
 import * as multer from 'multer';
 import { FileIsImageValidationPipe } from 'src/pipes/ImageTypeValidator.pipe';
 import { ApiQueryLimitAndPage } from 'src/decorators/global.decorators';
+import { CreateCommentDto } from './dto/CreateComment.dto';
 
 @Controller('media')
 @ApiBearerAuth()
@@ -68,6 +69,45 @@ export class MediaController {
     @Param('id') mediaId: number | string,
   ): Promise<IResponseType> {
     return this.mediaService.getMediaDetail(+mediaId);
+  }
+
+  @Get('get-comments/:id')
+  @ApiOperation({
+    summary: 'Media Comments API',
+    description: 'Get comments of media',
+  })
+  @ApiParam({ name: 'id', required: true, description: 'Media Id' })
+  @ApiQuery({ name: 'replyTo', required: false })
+  getMediaComments(
+    @Param('id') mediaId: number | string,
+    @Query('replyTo') replyTo: string | number,
+  ): Promise<IResponseType> {
+    return this.mediaService.getComments(+mediaId, +replyTo);
+  }
+
+  @Post('create-comment/:id')
+  @UseGuards(JwtTokenVerifyGuard)
+  @ApiOperation({
+    summary: 'Create Comment API',
+    description: 'Create comment of media',
+  })
+  @ApiHeader({
+    name: 'accessToken',
+    description: 'Access Token',
+    required: true,
+  })
+  @ApiParam({ name: 'id', required: true, description: 'Media Id' })
+  createComment(
+    @Request() req: IRequestWithDecodedAccessToken,
+    @Param('id') mediaId: number | string,
+    @Body() commentData: CreateCommentDto,
+  ): Promise<IResponseType> {
+    const { decodedAccessToken } = req;
+    return this.mediaService.createComment(
+      decodedAccessToken,
+      +mediaId,
+      commentData,
+    );
   }
 
   @Post('upload')

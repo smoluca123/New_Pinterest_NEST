@@ -33,19 +33,22 @@ model categories {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model comment {
-  id         Int       @id @default(autoincrement())
-  content    String?   @db.VarChar(500)
-  user_id    Int?
-  created_at DateTime? @db.DateTime(0)
-  updated_at DateTime? @db.DateTime(0)
-  level      Int?
-  reply_to   Int?
-  media_id   Int?
-  media      media?    @relation(fields: [media_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "media_id_media_id")
-  user       user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_users_id")
+  id            Int       @id @default(autoincrement())
+  content       String?   @db.VarChar(500)
+  user_id       Int?
+  created_at    DateTime? @db.DateTime(0)
+  updated_at    DateTime? @db.DateTime(0)
+  level         Int?
+  reply_to      Int?
+  media_id      Int?
+  media         media?    @relation(fields: [media_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "media_id_media_id")
+  comment       comment?  @relation("commentTocomment", fields: [reply_to], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "replyto_comment_id")
+  other_comment comment[] @relation("commentTocomment")
+  user          user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_users_id")
 
   @@index([media_id], map: "media_id_media_id")
   @@index([user_id], map: "user_id_users_id")
+  @@index([reply_to], map: "replyto_comment_id")
 }
 
 model image {

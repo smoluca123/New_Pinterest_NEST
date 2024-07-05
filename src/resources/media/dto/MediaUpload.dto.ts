@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 // type MediaType = 'Group' | 'UnGroup';
 
@@ -16,6 +16,7 @@ export class MediaUploadDto {
 
   @ApiProperty({ description: 'Image Title' })
   @IsString()
+  @IsNotEmpty()
   name: string;
 
   @ApiProperty({
@@ -30,6 +31,7 @@ export class MediaUploadDto {
     description: 'Image Description',
   })
   @IsString()
+  @IsNotEmpty()
   description: string;
 
   //   @ApiProperty({
