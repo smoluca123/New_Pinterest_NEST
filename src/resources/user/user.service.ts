@@ -48,7 +48,7 @@ export class UserService {
           },
         ],
       };
-      const listUsers = await this.prisma.users.findMany({
+      const listUsers = await this.prisma.user.findMany({
         where: whereQuery,
         select: {
           id: true,
@@ -65,7 +65,7 @@ export class UserService {
         skip: (page - 1) * limit,
       });
 
-      const totalItems = await this.prisma.users.count({ where: whereQuery });
+      const totalItems = await this.prisma.user.count({ where: whereQuery });
 
       return {
         message: 'Get list users successfully!',
@@ -88,7 +88,7 @@ export class UserService {
   ): Promise<IResponseType> {
     try {
       const { id, username } = decodedAccessToken;
-      const userInfo = await this.prisma.users.findFirst({
+      const userInfo = await this.prisma.user.findFirst({
         where: {
           id: +id,
           username,
@@ -113,7 +113,7 @@ export class UserService {
     try {
       if (!userId) throw new BadRequestException('User ID is required!');
 
-      const userInfo = await this.prisma.users.findUnique({
+      const userInfo = await this.prisma.user.findUnique({
         where: {
           id: userId,
         },
@@ -149,7 +149,7 @@ export class UserService {
         },
       );
 
-      const checkUser = await this.prisma.users.findFirst({
+      const checkUser = await this.prisma.user.findFirst({
         where: {
           id: +id,
           username,
@@ -184,7 +184,7 @@ export class UserService {
         refresh_token,
         is_ban,
         ...userResult
-      } = await this.prisma.users.update({
+      } = await this.prisma.user.update({
         where: {
           id: checkUser.id,
         },
@@ -214,7 +214,7 @@ export class UserService {
   async banUser(userId: number, data: UserBanDto): Promise<IResponseType> {
     try {
       if (!userId) throw new BadRequestException('User ID is required!');
-      const user = await this.prisma.users.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: {
           id: userId,
         },
@@ -225,7 +225,7 @@ export class UserService {
       if (!user) throw new NotFoundException('User not found!');
 
       if (data.is_ban !== user.is_ban) {
-        await this.prisma.users.update({
+        await this.prisma.user.update({
           where: {
             id: userId,
           },
@@ -257,7 +257,7 @@ export class UserService {
     try {
       const { id } = decodedAccessToken;
       const { username, email, fullName: full_name, age, password } = userInfo;
-      const checkUser = await this.prisma.users.findFirst({
+      const checkUser = await this.prisma.user.findFirst({
         where: {
           id: +id,
         },
@@ -282,7 +282,7 @@ export class UserService {
       );
 
       const hashPassword = password && bcrypt.hashSync(password, 10);
-      const updatedUser = await this.prisma.users.update({
+      const updatedUser = await this.prisma.user.update({
         data: {
           username: username || undefined,
           email: email || undefined,
@@ -330,7 +330,7 @@ export class UserService {
       is_ban,
       type,
     } = userInfo;
-    const user = await this.prisma.users.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
@@ -364,7 +364,7 @@ export class UserService {
         expiresIn: '30d',
       },
     );
-    const updatedUser = await this.prisma.users.update({
+    const updatedUser = await this.prisma.user.update({
       where: {
         id,
       },
@@ -408,7 +408,7 @@ export class UserService {
   async deleteUser(userId: number): Promise<IResponseType> {
     try {
       if (!userId) throw new BadRequestException('User ID is required!');
-      const user = await this.prisma.users.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: {
           id: userId,
         },
@@ -416,7 +416,7 @@ export class UserService {
       if (!user || user.is_hidden)
         throw new NotFoundException('User not found!');
 
-      await this.prisma.users.update({
+      await this.prisma.user.update({
         where: {
           id: userId,
         },

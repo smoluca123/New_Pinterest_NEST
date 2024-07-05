@@ -22,7 +22,7 @@ export class AuthService {
   async login(credentials: UserLoginDto): Promise<IResponseType> {
     try {
       const { username, password } = credentials;
-      const checkUsername = await this.prisma.users.findFirst({
+      const checkUsername = await this.prisma.user.findFirst({
         where: {
           OR: [{ username }, { email: username }],
         },
@@ -71,7 +71,7 @@ export class AuthService {
         },
       );
 
-      await this.prisma.users.update({
+      await this.prisma.user.update({
         where: {
           id: checkUsername.id,
         },
@@ -101,7 +101,7 @@ export class AuthService {
         password,
       } = credentials;
 
-      const checkUser = await this.prisma.users.findFirst({
+      const checkUser = await this.prisma.user.findFirst({
         where: {
           OR: [{ username }, { email }],
         },
@@ -114,7 +114,7 @@ export class AuthService {
       const hashPassword = bcrypt.hashSync(password, 10);
 
       const time = new Date();
-      const createdUser = await this.prisma.users.create({
+      const createdUser = await this.prisma.user.create({
         data: {
           username,
           full_name,
@@ -154,7 +154,7 @@ export class AuthService {
       );
 
       //   Update refresh_token in users table
-      await this.prisma.users.update({
+      await this.prisma.user.update({
         where: {
           id: createdUser.id,
         },

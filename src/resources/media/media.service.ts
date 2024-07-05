@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   handleDefaultError,
   uploadFileStack,
@@ -57,12 +57,13 @@ export class MediaService {
           created_at: true,
           updated_at: true,
           type: true,
-          users: {
+          user: {
             select: {
               id: true,
               username: true,
               full_name: true,
               age: true,
+              avatar: true,
               user_type: true,
               created_at: true,
               updated_at: true,
@@ -91,6 +92,78 @@ export class MediaService {
           totalItems,
           items: mediaList,
         },
+        statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async getMediaDetail(mediaId: number): Promise<IResponseType> {
+    try {
+      if (!mediaId) throw new NotFoundException('Media ID is required');
+      const media = await this.prisma.media.findUnique({
+        where: {
+          id: mediaId,
+          is_hidden: 0,
+        },
+        include: {
+          image: {
+            select: {
+              id: true,
+              img_name: true,
+              url: true,
+              created_at: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              age: true,
+              avatar: true,
+              user_type: true,
+              created_at: true,
+              updated_at: true,
+              is_ban: true,
+            },
+          },
+
+          // comment: {
+          //   select: {
+          //     id: true,
+          //     content: true,
+          //     created_at: true,
+          //     updated_at: true,
+          //     user: {
+          //       select: {
+          //         id: true,
+          //         username: true,
+          //         full_name: true,
+          //         age: true,
+          //         avatar: true,
+          //         user_type: true,
+          //         created_at: true,
+          //         updated_at: true,
+          //         is_ban: true,
+          //       },
+          //     },
+          //   },
+          // },
+        },
+      });
+
+      if (!media) throw new NotFoundException('Media not found');
+
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      const { creator_id, is_hidden, ...restMediaResult } = media;
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+
+      return {
+        message: 'Get Media Detail Success',
+        data: { ...restMediaResult },
         statusCode: 200,
         date: new Date(),
       };
@@ -148,12 +221,13 @@ export class MediaService {
           id: createdMedia.id,
         },
         include: {
-          users: {
+          user: {
             select: {
               id: true,
               username: true,
               full_name: true,
               age: true,
+              avatar: true,
               user_type: true,
               created_at: true,
               updated_at: true,
@@ -172,17 +246,12 @@ export class MediaService {
       });
 
       /* eslint-disable @typescript-eslint/no-unused-vars */
-      const {
-        creator_id,
-        users: creator,
-        is_hidden,
-        ...restMediaResult
-      } = mediaResult;
+      const { creator_id, is_hidden, ...restMediaResult } = mediaResult;
       /* eslint-enable @typescript-eslint/no-unused-vars */
 
       return {
         message: 'Success',
-        data: { ...restMediaResult, creator },
+        data: { ...restMediaResult },
         // data: {},
         statusCode: 201,
         date: new Date(),
@@ -238,12 +307,13 @@ export class MediaService {
           id: createdMedia.id,
         },
         include: {
-          users: {
+          user: {
             select: {
               id: true,
               username: true,
               full_name: true,
               age: true,
+              avatar: true,
               user_type: true,
               created_at: true,
               updated_at: true,
@@ -262,17 +332,12 @@ export class MediaService {
       });
 
       /* eslint-disable @typescript-eslint/no-unused-vars */
-      const {
-        creator_id,
-        users: creator,
-        is_hidden,
-        ...restMediaResult
-      } = mediaResult;
+      const { creator_id, is_hidden, ...restMediaResult } = mediaResult;
       /* eslint-enable @typescript-eslint/no-unused-vars */
 
       return {
-        message: 'Success',
-        data: { ...restMediaResult, creator },
+        message: 'Media Upload Success',
+        data: { ...restMediaResult },
         // data: {},
         statusCode: 201,
         date: new Date(),

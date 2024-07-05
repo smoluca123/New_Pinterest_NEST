@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   MaxFileSizeValidator,
+  Param,
   ParseFilePipe,
   Post,
   Query,
@@ -24,6 +25,7 @@ import {
   ApiConsumes,
   ApiHeader,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
@@ -54,6 +56,18 @@ export class MediaController {
     @Query('keyword') keyword: string,
   ): Promise<IResponseType> {
     return this.mediaService.getMediaList(+limit, +page, keyword);
+  }
+
+  @Get('get-media-detail/:id')
+  @ApiOperation({
+    summary: 'Media Detail API',
+    description: 'Get detail of media',
+  })
+  @ApiParam({ name: 'id', required: true })
+  getMediaDetail(
+    @Param('id') mediaId: number | string,
+  ): Promise<IResponseType> {
+    return this.mediaService.getMediaDetail(+mediaId);
   }
 
   @Post('upload')
