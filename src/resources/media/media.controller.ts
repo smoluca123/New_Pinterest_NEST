@@ -1,16 +1,17 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
   Post,
   Query,
+  Req,
   Request,
   UploadedFiles,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { MediaService } from './media.service';
 import {
@@ -21,20 +22,22 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/guards/roles.guard';
 import {
   ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiHeader,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { MediaUploadDto } from './dto/MediaUpload.dto';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { JwtTokenVerifyGuard } from 'src/guards/jwt-token-verify.guard';
-import * as multer from 'multer';
 import { FileIsImageValidationPipe } from 'src/pipes/ImageTypeValidator.pipe';
-import { ApiQueryLimitAndPage } from 'src/decorators/global.decorators';
+import { CreateCommentDto } from './dto/CreateComment.dto';
+import {
+  decoratorsCreateComment,
+  decoratorsDeleteComment,
+  decoratorsGetComments,
+  decoratorsGetMediaList,
+  decoratorsMediaUpload,
+  decoratorsRemoveComment,
+  decoratorsSaveMedia,
+} from './media.decorators';
 
 @Controller('media')
 @ApiBearerAuth()
@@ -44,12 +47,7 @@ export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @Get('get-media-list')
-  @ApiOperation({
-    summary: 'Media List API',
-    description: 'Get list of media',
-  })
-  @ApiQueryLimitAndPage()
-  @ApiQuery({ name: 'keyword', required: false })
+  @decoratorsGetMediaList()
   getMediaList(
     @Query('limit') limit: string | number,
     @Query('page') page: string | number,
@@ -70,37 +68,34 @@ export class MediaController {
     return this.mediaService.getMediaDetail(+mediaId);
   }
 
+  @Get('get-comments/:id')
+  @decoratorsGetComments()
+  getMediaComments(
+    @Query('limit') limit: string | number,
+    @Query('page') page: string | number,
+    @Param('id') mediaId: number | string,
+    @Query('replyTo') replyTo: string | number,
+  ): Promise<IResponseType> {
+    return this.mediaService.getComments(+limit, +page, +mediaId, +replyTo);
+  }
+
+  @Post('create-comment/:id')
+  @decoratorsCreateComment()
+  createComment(
+    @Request() req: IRequestWithDecodedAccessToken,
+    @Param('id') mediaId: number | string,
+    @Body() commentData: CreateCommentDto,
+  ): Promise<IResponseType> {
+    const { decodedAccessToken } = req;
+    return this.mediaService.createComment(
+      decodedAccessToken,
+      +mediaId,
+      commentData,
+    );
+  }
+
   @Post('upload')
-  @UseGuards(JwtTokenVerifyGuard)
-  @ApiOperation({
-    summary: 'Media Upload API',
-    description: 'Upload media to server',
-  })
-  @ApiHeader({
-    name: 'accessToken',
-    description: 'Access Token',
-    required: true,
-  })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: MediaUploadDto })
-  @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      storage: multer.memoryStorage(),
-      limits: {
-        fileSize: 1024 * 1024 * 50, //50MB
-      },
-      fileFilter(req, file, cb) {
-        // /^.*\.(jpg|jpeg|png|gif|bmp|webp)$/i
-        if (!file.mimetype.match('image/*')) {
-          console.log('Cancel upload, file not support');
-          // Block image upload in public/img folder
-          cb(null, false);
-        } else {
-          cb(null, true);
-        }
-      },
-    }),
-  )
+  @decoratorsMediaUpload()
   async mediaUpload(
     @UploadedFiles(
       FileIsImageValidationPipe,
@@ -123,5 +118,34 @@ export class MediaController {
       decodedAccessToken,
       mediaData,
     );
+  }
+
+  @Post('save-media/:id')
+  @decoratorsSaveMedia()
+  saveMedia(
+    @Req() request: IRequestWithDecodedAccessToken,
+    @Param('id') mediaId: number | string,
+  ): Promise<IResponseType> {
+    const { decodedAccessToken } = request;
+    return this.mediaService.saveMedia(decodedAccessToken, +mediaId);
+  }
+
+  @Delete('remove-comment/:id')
+  @decoratorsRemoveComment()
+  removeComment(
+    @Req() request: IRequestWithDecodedAccessToken,
+    @Param('id') commentId: number | string,
+  ): Promise<IResponseType> {
+    const { decodedAccessToken } = request;
+    return this.mediaService.removeComment(decodedAccessToken, +commentId);
+  }
+
+  @Delete('delete-comment/:id')
+  @decoratorsDeleteComment()
+  deleteComment(
+    @Req() request: IRequestWithDecodedAccessToken,
+    @Param('id') commentId: number | string,
+  ): Promise<IResponseType> {
+    return this.mediaService.deleteComment(+commentId);
   }
 }

@@ -33,19 +33,22 @@ model categories {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model comment {
-  id         Int       @id @default(autoincrement())
-  content    String?   @db.VarChar(500)
-  user_id    Int?
-  created_at DateTime? @db.DateTime(0)
-  updated_at DateTime? @db.DateTime(0)
-  level      Int?
-  reply_to   Int?
-  media_id   Int?
-  media      media?    @relation(fields: [media_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "media_id_media_id")
-  user       user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_users_id")
+  id            Int       @id @default(autoincrement())
+  content       String?   @db.VarChar(500)
+  user_id       Int?
+  created_at    DateTime? @db.DateTime(0)
+  updated_at    DateTime? @db.DateTime(0)
+  level         Int?
+  reply_to      Int?
+  media_id      Int?
+  media         media?    @relation(fields: [media_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "media_id_media_id")
+  comment       comment?  @relation("commentTocomment", fields: [reply_to], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "replyto_comment_id")
+  other_comment comment[] @relation("commentTocomment")
+  user          user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_users_id")
 
   @@index([media_id], map: "media_id_media_id")
   @@index([user_id], map: "user_id_users_id")
+  @@index([reply_to], map: "replyto_comment_id")
 }
 
 model image {
@@ -61,18 +64,19 @@ model image {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model media {
-  id          Int        @id @default(autoincrement())
-  name        String     @db.VarChar(255)
-  slug        String     @default("") @db.VarChar(255)
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(255)
+  slug        String       @default("") @db.VarChar(255)
   creator_id  Int?
-  description String?    @db.VarChar(500)
-  type        media_type @default(Ungroup)
-  created_at  DateTime?  @db.DateTime(0)
-  updated_at  DateTime?  @db.DateTime(0)
-  is_hidden   Int        @default(0)
+  description String?      @db.VarChar(500)
+  type        media_type   @default(Ungroup)
+  created_at  DateTime?    @db.DateTime(0)
+  updated_at  DateTime?    @db.DateTime(0)
+  is_hidden   Int          @default(0)
   comment     comment[]
   image       image[]
-  user        user?      @relation(fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "creatorId_user_id")
+  user        user?        @relation(fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "creatorId_user_id")
+  save_media  save_media[]
 
   @@index([creator_id], map: "creatorId_user_id")
   @@index([id], map: "id")
@@ -80,22 +84,23 @@ model media {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model user {
-  id            Int       @id @default(autoincrement())
-  username      String?   @db.VarChar(255)
-  email         String?   @db.VarChar(255)
-  type          Int       @default(1)
-  full_name     String?   @db.VarChar(255)
-  avatar        String?   @db.VarChar(500)
+  id            Int          @id @default(autoincrement())
+  username      String?      @db.VarChar(255)
+  email         String?      @db.VarChar(255)
+  type          Int          @default(1)
+  full_name     String?      @db.VarChar(255)
+  avatar        String?      @db.VarChar(500)
   age           Int?
-  password      String?   @db.VarChar(255)
-  created_at    DateTime? @db.DateTime(0)
-  updated_at    DateTime? @db.DateTime(0)
-  is_ban        Int       @default(0)
-  refresh_token String?   @db.VarChar(255)
-  is_hidden     Int       @default(0)
+  password      String?      @db.VarChar(255)
+  created_at    DateTime?    @db.DateTime(0)
+  updated_at    DateTime?    @db.DateTime(0)
+  is_ban        Int          @default(0)
+  refresh_token String?      @db.VarChar(255)
+  is_hidden     Int          @default(0)
   comment       comment[]
   media         media[]
-  user_type     user_type @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "type_usertypes")
+  save_media    save_media[]
+  user_type     user_type    @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "type_usertypes")
 
   @@index([type], map: "type_usertypes")
 }
@@ -104,6 +109,18 @@ model user_type {
   id        Int     @id @default(autoincrement())
   type_name String? @db.VarChar(255)
   user      user[]
+}
+
+model save_media {
+  id         Int       @id @default(autoincrement())
+  media_id   Int?
+  user_id    Int?
+  created_at DateTime? @db.DateTime(0)
+  media      media?    @relation(fields: [media_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "mediaid_media_id")
+  user       user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "userid_user_id")
+
+  @@index([media_id], map: "mediaid_media_id")
+  @@index([user_id], map: "userid_user_id")
 }
 
 enum media_type {

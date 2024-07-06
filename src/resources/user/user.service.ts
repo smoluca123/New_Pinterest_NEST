@@ -17,6 +17,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { DEFAULT_LIMIT } from 'src/global/constant.global';
 
 @Injectable()
 export class UserService {
@@ -32,7 +33,7 @@ export class UserService {
     type: string | number,
   ): Promise<IResponseType> {
     try {
-      limit = limit ? +limit : 3;
+      limit = limit ? +limit : DEFAULT_LIMIT;
       page = page ? +page : 1;
 
       const whereQuery = {

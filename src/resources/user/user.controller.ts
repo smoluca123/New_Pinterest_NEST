@@ -13,15 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtTokenVerifyGuard } from 'src/guards/jwt-token-verify.guard';
-import {
-  ApiBearerAuth,
-  ApiHeader,
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   UserBanDto,
   UserInfoUpdateDto,
@@ -30,12 +22,19 @@ import {
 import {
   IRequestWithDecodedAccessToken,
   IResponseType,
-  RolesLevel,
 } from 'src/interfaces/interfaces.global';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiQueryLimitAndPage } from 'src/decorators/global.decorators';
 import { RolesGuard } from 'src/guards/roles.guard';
-import { Roles } from 'src/decorators/roles.decorator';
+import {
+  decoratorsBanUser,
+  decoratorsDeleteUser,
+  decoratorsInfomation,
+  decoratorsInfomationByID,
+  decoratorsListUsers,
+  decoratorsRefreshToken,
+  decoratorsUpdateInfo,
+  decoratorsUpdateInfoByID,
+} from './user.decorators';
 
 @ApiTags('User Managements')
 @ApiBearerAuth()
@@ -45,21 +44,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/list-users')
-  @ApiOperation({
-    summary: 'User List API',
-    description: 'Get list of users',
-  })
-  @ApiQueryLimitAndPage()
-  @ApiQuery({
-    name: 'keyword',
-    description: 'Search by keyword',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'type',
-    description: 'Search by type',
-    required: false,
-  })
+  @decoratorsListUsers()
   getListUsers(
     @Query('limit') limit: string | number,
     @Query('page') page: string | number,
@@ -70,16 +55,7 @@ export class UserController {
   }
 
   @Get('/infomation')
-  @UseGuards(JwtTokenVerifyGuard)
-  @ApiHeader({
-    name: 'accessToken',
-    description: 'Access Token',
-    required: true,
-  })
-  @ApiOperation({
-    summary: 'User Infomation API',
-    description: 'Get current user infomation',
-  })
+  @decoratorsInfomation()
   getInfomation(
     @Request() request: IRequestWithDecodedAccessToken,
   ): Promise<IResponseType> {
@@ -88,14 +64,7 @@ export class UserController {
   }
 
   @Get('/infomation/:id')
-  @ApiOperation({
-    summary: 'User Infomation API',
-    description: 'Get current user infomation',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'User ID',
-  })
+  @decoratorsInfomationByID()
   getInfomationByID(
     @Param('id') userId: string | number,
   ): Promise<IResponseType> {
@@ -103,15 +72,7 @@ export class UserController {
   }
 
   @Get('/refresh-token')
-  @ApiHeader({
-    name: 'accessToken',
-    description: 'Access Token',
-    required: true,
-  })
-  @ApiOperation({
-    summary: 'User Refresh Token API',
-    description: "Refresh the current user's access token",
-  })
+  @decoratorsRefreshToken()
   getRefreshToken(
     @Headers('accessToken') accessToken: string,
   ): Promise<IResponseType> {
@@ -119,15 +80,7 @@ export class UserController {
   }
 
   @Post('/ban-user/:id')
-  @Roles([RolesLevel.ADMIN])
-  @ApiOperation({
-    summary: 'User Ban API (Admin Only)',
-    description: 'Ban user',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'User ID',
-  })
+  @decoratorsBanUser()
   postBanUser(
     @Param('id') userId: string | number,
     @Body() data: UserBanDto,
@@ -136,17 +89,7 @@ export class UserController {
   }
 
   @Put('/update-info')
-  @UseGuards(JwtTokenVerifyGuard)
-  @ApiOperation({
-    summary: 'User Update Info API',
-    description:
-      "Updates the current user's account information. Fields that are not to be updated should be left blank.",
-  })
-  @ApiHeader({
-    name: 'accessToken',
-    description: 'Access Token',
-    required: true,
-  })
+  @decoratorsUpdateInfo()
   putUpdateInfo(
     @Req() request: IRequestWithDecodedAccessToken,
     @Body() userInfo: UserInfoUpdateDto,
@@ -156,16 +99,7 @@ export class UserController {
   }
 
   @Put('/update-info/:id')
-  @Roles([RolesLevel.ADMIN])
-  @ApiOperation({
-    summary: 'User Update API (Admin Only)',
-    description:
-      'Updates user account information. Fields that are not to be updated should be left blank.',
-  })
-  @ApiParam({
-    name: 'id',
-    description: 'User ID',
-  })
+  @decoratorsUpdateInfoByID()
   putUpdateUser(
     @Param('id') userId: string,
     @Body() userInfo: UserUpdateDto,
@@ -174,15 +108,7 @@ export class UserController {
   }
 
   @Delete('/delete-user/:id')
-  @ApiParam({
-    name: 'id',
-    description: 'User ID',
-  })
-  @Roles([RolesLevel.ADMIN])
-  @ApiOperation({
-    summary: 'User Delete API (Admin Only)',
-    description: 'Delete user',
-  })
+  @decoratorsDeleteUser()
   deleteUser(@Param('id') userId: string | number): Promise<IResponseType> {
     return this.userService.deleteUser(+userId);
   }
