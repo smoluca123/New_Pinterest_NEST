@@ -34,6 +34,7 @@ import {
   decoratorsDeleteComment,
   decoratorsGetComments,
   decoratorsGetMediaList,
+  decoratorsGetSavedMedias,
   decoratorsMediaUpload,
   decoratorsRemoveComment,
   decoratorsSaveMedia,
@@ -77,6 +78,15 @@ export class MediaController {
     @Query('replyTo') replyTo: string | number,
   ): Promise<IResponseType> {
     return this.mediaService.getComments(+limit, +page, +mediaId, +replyTo);
+  }
+
+  @Get('get-saved-medias')
+  @decoratorsGetSavedMedias()
+  getSavedMedias(
+    @Request() req: IRequestWithDecodedAccessToken,
+  ): Promise<IResponseType> {
+    const { decodedAccessToken } = req;
+    return this.mediaService.getSavedMedias(decodedAccessToken);
   }
 
   @Post('create-comment/:id')

@@ -36,6 +36,16 @@ export const decoratorsGetComments = () =>
     ApiQuery({ name: 'replyTo', required: false }),
   );
 
+export const decoratorsGetSavedMedias = () =>
+  applyDecorators(
+    UseGuards(JwtTokenVerifyGuard),
+    ApiHeader({
+      name: 'accessToken',
+      description: 'Access Token',
+      required: true,
+    }),
+  );
+
 export const decoratorsCreateComment = () =>
   applyDecorators(
     UseGuards(JwtTokenVerifyGuard),
