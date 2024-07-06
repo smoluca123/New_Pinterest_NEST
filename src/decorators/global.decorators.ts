@@ -15,7 +15,7 @@ export function ApiQueryLimitAndPage(options?: {
   return applyDecorators(
     ApiQuery({
       name: options?.limit?.name || 'limit',
-      description: `Limit result on page (Default : ${options?.limit?.defaultValue || 3})`,
+      description: `Limit result on page (Default : ${options?.limit?.defaultValue || 10})`,
       required: false,
     }),
     ApiQuery({

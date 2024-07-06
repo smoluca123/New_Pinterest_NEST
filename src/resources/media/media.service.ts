@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   handleDefaultError,
   uploadFileStack,
@@ -12,6 +17,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import slugify from 'slugify';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { CreateCommentDto } from './dto/CreateComment.dto';
+import { DEFAULT_LIMIT } from 'src/global/constant.global';
 
 @Injectable()
 export class MediaService {
@@ -26,7 +32,7 @@ export class MediaService {
     keyword: string,
   ): Promise<IResponseType> {
     try {
-      limit = limit ? +limit : 3;
+      limit = limit ? +limit : DEFAULT_LIMIT;
       page = page ? +page : 1;
 
       const whereQuery = {
@@ -173,23 +179,33 @@ export class MediaService {
     }
   }
 
-  async getComments(mediaId: number, replyTo: number): Promise<IResponseType> {
+  async getComments(
+    limit: number,
+    page: number,
+    mediaId: number,
+    replyTo: number,
+  ): Promise<IResponseType> {
     try {
       if (!mediaId) throw new NotFoundException('Media ID is required');
 
+      limit = limit ? +limit : DEFAULT_LIMIT;
+      page = page ? +page : 1;
+
+      const whereQuery = {
+        media_id: mediaId,
+        AND: [
+          {
+            OR: [
+              {
+                reply_to: replyTo || undefined,
+              },
+            ],
+          },
+        ],
+      };
+
       const comments = await this.prisma.comment.findMany({
-        where: {
-          media_id: mediaId,
-          AND: [
-            {
-              OR: [
-                {
-                  reply_to: replyTo || undefined,
-                },
-              ],
-            },
-          ],
-        },
+        where: whereQuery,
         include: {
           user: {
             select: {
@@ -205,11 +221,25 @@ export class MediaService {
             },
           },
         },
+        take: limit,
+        skip: (page - 1) * limit,
+        orderBy: {
+          created_at: 'asc',
+        },
+      });
+
+      const totalItems = await this.prisma.comment.count({
+        where: whereQuery,
       });
 
       return {
         message: 'Get Comments Success',
-        data: comments,
+        data: {
+          currentPage: page,
+          totalPage: Math.ceil(totalItems / limit),
+          totalItems,
+          items: comments,
+        },
         statusCode: 200,
         date: new Date(),
       };
@@ -462,6 +492,158 @@ export class MediaService {
       };
     } catch (error) {
       console.log(error);
+      handleDefaultError(error);
+    }
+  }
+
+  async saveMedia(
+    decodedAccessToken: IDecodedAccecssTokenType,
+    mediaId: number,
+  ): Promise<IResponseType> {
+    try {
+      if (!mediaId) throw new BadRequestException('Media ID is required');
+
+      const { id } = decodedAccessToken;
+
+      const media = await this.prisma.media.findUnique({
+        where: {
+          id: mediaId,
+        },
+      });
+
+      if (!media) throw new NotFoundException('Media not found');
+
+      const checkSavedMedia = await this.prisma.save_media.findFirst({
+        where: {
+          user_id: +id,
+          media_id: mediaId,
+        },
+      });
+
+      if (checkSavedMedia) {
+        await this.prisma.save_media.delete({
+          where: {
+            id: checkSavedMedia.id,
+          },
+        });
+
+        return {
+          message: 'Unsave Media Success',
+          data: null,
+          statusCode: 204,
+          date: new Date(),
+        };
+      }
+
+      const createdSave = await this.prisma.save_media.create({
+        data: {
+          media_id: mediaId,
+          user_id: +id,
+          created_at: new Date(),
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              age: true,
+              avatar: true,
+              user_type: true,
+              created_at: true,
+              updated_at: true,
+              is_ban: true,
+            },
+          },
+          media: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              type: true,
+              creator_id: true,
+              created_at: true,
+              updated_at: true,
+              is_hidden: true,
+            },
+          },
+        },
+      });
+
+      return {
+        message: 'Save Media Success',
+        data: createdSave,
+        statusCode: 201,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async removeComment(
+    decodedAccessToken: IDecodedAccecssTokenType,
+    commentId: number,
+  ): Promise<IResponseType> {
+    if (!commentId) throw new NotFoundException('Comment ID is required');
+
+    const { id } = decodedAccessToken;
+
+    const comment = await this.prisma.comment.findUnique({
+      where: {
+        id: commentId,
+      },
+    });
+
+    if (!comment) throw new NotFoundException('Comment not found');
+    if (comment.user_id !== +id)
+      throw new ForbiddenException('You cannot remove this comment');
+
+    await this.prisma.comment.delete({
+      where: {
+        id: commentId,
+        user_id: +id,
+      },
+    });
+
+    try {
+      return {
+        message: 'Remove Comment Success',
+        data: null,
+        statusCode: 204,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async deleteComment(commentId: number): Promise<IResponseType> {
+    try {
+      if (!commentId) throw new NotFoundException('Comment ID is required');
+
+      const comment = await this.prisma.comment.findUnique({
+        where: {
+          id: commentId,
+        },
+      });
+
+      if (!comment) throw new NotFoundException('Comment not found');
+
+      await this.prisma.comment.delete({
+        where: {
+          id: commentId,
+        },
+      });
+
+      return {
+        message: 'Delete Comment Success',
+        data: null,
+        statusCode: 204,
+        date: new Date(),
+      };
+    } catch (error) {
       handleDefaultError(error);
     }
   }
