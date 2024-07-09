@@ -7,6 +7,7 @@ import {
   Param,
   ParseFilePipe,
   Post,
+  Put,
   Query,
   Req,
   Request,
@@ -38,7 +39,10 @@ import {
   decoratorsMediaUpload,
   decoratorsRemoveComment,
   decoratorsSaveMedia,
+  decoratorsUpdateMedia,
+  decoratorsUpdateMediaAdmin,
 } from './media.decorators';
+import { MediaUpdateAdminDto, MediaUpdateDto } from './dto/MediaUpdate.dto';
 
 @Controller('media')
 @ApiBearerAuth()
@@ -138,6 +142,29 @@ export class MediaController {
   ): Promise<IResponseType> {
     const { decodedAccessToken } = request;
     return this.mediaService.saveMedia(decodedAccessToken, +mediaId);
+  }
+
+  @Put('update-media/:id')
+  @decoratorsUpdateMedia()
+  updateMedia(
+    @Req() request: IRequestWithDecodedAccessToken,
+    @Param('id') mediaId: number | string,
+    @Body() mediaData: MediaUpdateDto,
+  ): Promise<IResponseType> {
+    const { decodedAccessToken } = request;
+    return this.mediaService.updateMedia(
+      decodedAccessToken,
+      +mediaId,
+      mediaData,
+    );
+  }
+  @Put('update-media-admin/:id')
+  @decoratorsUpdateMediaAdmin()
+  updateMediaAdmin(
+    @Param('id') mediaId: number | string,
+    @Body() mediaData: MediaUpdateAdminDto,
+  ): Promise<IResponseType> {
+    return this.mediaService.updateMediaAdmin(+mediaId, mediaData);
   }
 
   @Delete('remove-comment/:id')

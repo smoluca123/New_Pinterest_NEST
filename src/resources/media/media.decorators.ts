@@ -95,6 +95,28 @@ export const decoratorsMediaUpload = () =>
     ),
   );
 
+export const decoratorsUpdateMedia = () =>
+  applyDecorators(
+    UseGuards(JwtTokenVerifyGuard),
+    ApiHeader({
+      name: 'accessToken',
+      description: 'Access Token',
+      required: true,
+    }),
+    ApiOperation({ summary: 'Update Media API', description: 'Update media' }),
+    ApiParam({ name: 'id', required: true, description: 'Media ID' }),
+  );
+
+export const decoratorsUpdateMediaAdmin = () =>
+  applyDecorators(
+    Roles([RolesLevel.ADMIN]),
+    ApiOperation({
+      summary: 'Update Media API (Admin Only)',
+      description: 'Update media',
+    }),
+    ApiParam({ name: 'id', required: true, description: 'Media ID' }),
+  );
+
 export const decoratorsSaveMedia = () =>
   applyDecorators(
     UseGuards(JwtTokenVerifyGuard),
