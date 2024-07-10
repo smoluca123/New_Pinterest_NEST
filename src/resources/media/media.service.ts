@@ -251,6 +251,7 @@ export class MediaService {
 
   async getSavedMedias(
     decodedAccessToken: IDecodedAccecssTokenType,
+    idMedia: number,
   ): Promise<IResponseType> {
     try {
       const { id } = decodedAccessToken;
@@ -258,6 +259,15 @@ export class MediaService {
       const savedMedias = await this.prisma.save_media.findMany({
         where: {
           user_id: +id,
+          AND: [
+            {
+              OR: [
+                {
+                  media_id: idMedia || undefined,
+                },
+              ],
+            },
+          ],
         },
         select: {
           id: true,
