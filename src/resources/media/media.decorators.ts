@@ -44,6 +44,11 @@ export const decoratorsGetSavedMedias = () =>
       description: 'Access Token',
       required: true,
     }),
+    ApiQuery({
+      name: 'id',
+      description: 'Media ID',
+      required: false,
+    }),
   );
 
 export const decoratorsCreateComment = () =>
