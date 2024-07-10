@@ -88,9 +88,10 @@ export class MediaController {
   @decoratorsGetSavedMedias()
   getSavedMedias(
     @Request() req: IRequestWithDecodedAccessToken,
+    @Query('id') mediaId: number | string,
   ): Promise<IResponseType> {
     const { decodedAccessToken } = req;
-    return this.mediaService.getSavedMedias(decodedAccessToken);
+    return this.mediaService.getSavedMedias(decodedAccessToken, +mediaId);
   }
 
   @Post('create-comment/:id')
