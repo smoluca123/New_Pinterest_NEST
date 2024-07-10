@@ -18,6 +18,7 @@ import slugify from 'slugify';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import { CreateCommentDto } from './dto/CreateComment.dto';
 import { DEFAULT_LIMIT } from 'src/global/constant.global';
+import { MediaUpdateAdminDto, MediaUpdateDto } from './dto/MediaUpdate.dto';
 
 @Injectable()
 export class MediaService {
@@ -634,6 +635,136 @@ export class MediaService {
         message: 'Save Media Success',
         data: createdSave,
         statusCode: 201,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async updateMedia(
+    decodedAccessToken: IDecodedAccecssTokenType,
+    mediaId: number,
+    updatedMediaData: MediaUpdateDto,
+  ): Promise<IResponseType> {
+    try {
+      if (!mediaId) throw new NotFoundException('Media ID is required');
+
+      const { id } = decodedAccessToken;
+      const { slug, description, name } = updatedMediaData;
+
+      const media = await this.prisma.media.findUnique({
+        where: {
+          id: mediaId,
+          is_hidden: 0,
+        },
+      });
+
+      if (!media) throw new NotFoundException('Media not found');
+
+      if (media.creator_id !== +id)
+        throw new ForbiddenException('You cannot update this media');
+
+      const updatedMedia = await this.prisma.media.update({
+        where: {
+          id: mediaId,
+        },
+        data: {
+          name: name || undefined,
+          slug: slug || undefined,
+          description: description || undefined,
+          updated_at: new Date(),
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              age: true,
+              avatar: true,
+              user_type: true,
+              created_at: true,
+              updated_at: true,
+              is_ban: true,
+            },
+          },
+          image: {
+            select: {
+              id: true,
+              img_name: true,
+              url: true,
+              created_at: true,
+            },
+          },
+        },
+      });
+      return {
+        message: 'Media Update Success',
+        data: updatedMedia,
+        statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async updateMediaAdmin(
+    mediaId: number,
+    updatedMediaData: MediaUpdateAdminDto,
+  ): Promise<IResponseType> {
+    try {
+      if (!mediaId) throw new NotFoundException('Media ID is required');
+      const { slug, description, name, isHidden } = updatedMediaData;
+
+      const media = await this.prisma.media.findUnique({
+        where: {
+          id: mediaId,
+        },
+      });
+
+      if (!media) throw new NotFoundException('Media not found');
+
+      const updatedMedia = await this.prisma.media.update({
+        where: {
+          id: mediaId,
+        },
+        data: {
+          name: name || undefined,
+          slug: slug || undefined,
+          description: description || undefined,
+          is_hidden: isHidden ?? undefined,
+          updated_at: new Date(),
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              age: true,
+              avatar: true,
+              user_type: true,
+              created_at: true,
+              updated_at: true,
+              is_ban: true,
+            },
+          },
+          image: {
+            select: {
+              id: true,
+              img_name: true,
+              url: true,
+              created_at: true,
+            },
+          },
+        },
+      });
+      return {
+        message: 'Media Update Success',
+        data: updatedMedia,
+        statusCode: 200,
         date: new Date(),
       };
     } catch (error) {

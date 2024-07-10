@@ -107,9 +107,12 @@ export class AuthService {
         },
       });
 
-      if (checkUser.username)
-        throw new ConflictException('Username already exists!');
-      if (checkUser.email) throw new ConflictException('Email already exists!');
+      if (checkUser) {
+        if (checkUser.username)
+          throw new ConflictException('Username already exists!');
+        if (checkUser.email)
+          throw new ConflictException('Email already exists!');
+      }
 
       const hashPassword = bcrypt.hashSync(password, 10);
 
@@ -169,6 +172,7 @@ export class AuthService {
         date: new Date(),
       };
     } catch (error) {
+      console.log(error);
       handleDefaultError(error);
     }
   }
