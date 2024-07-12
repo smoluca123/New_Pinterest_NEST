@@ -847,4 +847,48 @@ export class MediaService {
       handleDefaultError(error);
     }
   }
+
+  async removeMedia(
+    decodedAccessToken: IDecodedAccecssTokenType,
+    mediaId: number,
+  ): Promise<IResponseType> {
+    try {
+      // Implement logic to remove media
+
+      if (!mediaId) throw new NotFoundException('Media ID is required');
+
+      const { id } = decodedAccessToken;
+
+      const media = await this.prisma.media.findUnique({
+        where: {
+          id: mediaId,
+        },
+      });
+
+      if (!media) throw new NotFoundException('Media not found');
+      if (media.creator_id !== +id)
+        throw new ForbiddenException('You cannot remove this media');
+
+      await this.prisma.media.update({
+        where: {
+          id: mediaId,
+        },
+        data: {
+          is_hidden: 1,
+          name: media.name + new Date().getTime(),
+          slug: media.slug + new Date().getTime(),
+          updated_at: new Date(),
+        },
+      });
+
+      return {
+        message: 'Remove Media Success',
+        data: null,
+        statusCode: 204,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
 }
