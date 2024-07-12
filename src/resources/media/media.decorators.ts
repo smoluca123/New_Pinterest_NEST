@@ -161,3 +161,18 @@ export const decoratorsDeleteComment = () =>
     }),
     ApiParam({ name: 'id', required: true, description: 'Comment Id' }),
   );
+
+export const decoratorsRemoveMedia = () =>
+  applyDecorators(
+    UseGuards(JwtTokenVerifyGuard),
+    ApiOperation({
+      summary: 'Remove Media API',
+      description: 'Remove media',
+    }),
+    ApiHeader({
+      name: 'accessToken',
+      description: 'Access Token',
+      required: true,
+    }),
+    ApiParam({ name: 'id', required: true, description: 'Media Id' }),
+  );

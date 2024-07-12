@@ -38,6 +38,7 @@ import {
   decoratorsGetSavedMedias,
   decoratorsMediaUpload,
   decoratorsRemoveComment,
+  decoratorsRemoveMedia,
   decoratorsSaveMedia,
   decoratorsUpdateMedia,
   decoratorsUpdateMediaAdmin,
@@ -185,5 +186,15 @@ export class MediaController {
     @Param('id') commentId: number | string,
   ): Promise<IResponseType> {
     return this.mediaService.deleteComment(+commentId);
+  }
+
+  @Delete('remove-media/:id')
+  @decoratorsRemoveMedia()
+  removeMedia(
+    @Req() request: IRequestWithDecodedAccessToken,
+    @Param('id') mediaId: number | string,
+  ): Promise<IResponseType> {
+    const { decodedAccessToken } = request;
+    return this.mediaService.removeMedia(decodedAccessToken, +mediaId);
   }
 }
