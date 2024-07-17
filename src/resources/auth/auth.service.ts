@@ -145,13 +145,13 @@ export class AuthService {
       const accessToken = await this.jwt.signAsync({
         id: createdUser.id,
         username: createdUser.username,
-        key: new Date().getTime(),
+        key: time.getTime(),
       });
       const refreshToken = await this.jwt.signAsync(
         {
           id: createdUser.id,
           username: createdUser.username,
-          key: new Date().getTime(),
+          key: time.getTime(),
         },
         { expiresIn: '30d' },
       );
