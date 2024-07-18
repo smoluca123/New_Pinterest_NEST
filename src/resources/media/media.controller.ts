@@ -35,6 +35,7 @@ import {
   decoratorsDeleteComment,
   decoratorsGetComments,
   decoratorsGetMediaList,
+  decoratorsGetMediaUploadedByUserID,
   decoratorsGetSavedMedias,
   decoratorsMediaUpload,
   decoratorsRemoveComment,
@@ -60,6 +61,22 @@ export class MediaController {
     @Query('keyword') keyword: string,
   ): Promise<IResponseType> {
     return this.mediaService.getMediaList(+limit, +page, keyword);
+  }
+
+  @Get('get-media-list/:id')
+  @decoratorsGetMediaUploadedByUserID()
+  getMediaUploadedByUserID(
+    @Param('id') userID: number | string,
+    @Query('limit') limit: string | number,
+    @Query('page') page: string | number,
+    @Query('keyword') keyword: string,
+  ): Promise<IResponseType> {
+    return this.mediaService.getMediaUploadedByUserID(
+      +userID,
+      +limit,
+      +page,
+      keyword,
+    );
   }
 
   @Get('get-media-detail/:id')
