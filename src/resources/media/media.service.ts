@@ -108,6 +108,90 @@ export class MediaService {
     }
   }
 
+  async getMediaUploadedByUserID(
+    userId: number,
+    limit: number,
+    page: number,
+    keyword: string,
+  ): Promise<IResponseType> {
+    try {
+      if (!userId) throw new BadRequestException('User ID is required');
+      limit = limit ? +limit : DEFAULT_LIMIT;
+      page = page ? +page : 1;
+
+      const whereQuery = {
+        AND: [
+          {
+            OR: [
+              { name: { contains: keyword } },
+              { description: { contains: keyword } },
+            ],
+          },
+          {
+            creator_id: userId,
+            is_hidden: 0,
+          },
+        ],
+      };
+
+      const totalItems = await this.prisma.media.count({
+        where: whereQuery,
+      });
+
+      const mediaList = await this.prisma.media.findMany({
+        where: whereQuery,
+
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          created_at: true,
+          updated_at: true,
+          type: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              full_name: true,
+              age: true,
+              avatar: true,
+              user_type: true,
+              created_at: true,
+              updated_at: true,
+              is_ban: true,
+            },
+          },
+          image: {
+            select: {
+              id: true,
+              img_name: true,
+              url: true,
+              created_at: true,
+            },
+          },
+        },
+
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+
+      return {
+        message: 'Media List',
+        data: {
+          currentPage: page,
+          totalPage: Math.ceil(totalItems / limit),
+          totalItems,
+          items: mediaList,
+        },
+        statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
   async getMediaDetail(mediaId: number): Promise<IResponseType> {
     try {
       if (!mediaId) throw new NotFoundException('Media ID is required');

@@ -25,6 +25,17 @@ export const decoratorsGetMediaList = () =>
     ApiQuery({ name: 'keyword', required: false }),
   );
 
+export const decoratorsGetMediaUploadedByUserID = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: 'Media List Uploaded By User API',
+      description: 'Get list media uploaded by user',
+    }),
+    ApiParam({ name: 'id', required: true, description: 'User Id' }),
+    ApiQueryLimitAndPage(),
+    ApiQuery({ name: 'keyword', required: false }),
+  );
+
 export const decoratorsGetComments = () =>
   applyDecorators(
     ApiOperation({
