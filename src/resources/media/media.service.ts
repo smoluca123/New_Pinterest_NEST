@@ -402,6 +402,73 @@ export class MediaService {
     }
   }
 
+  async getSavedMediasByUserID(
+    userId: number,
+    idMedia: number,
+  ): Promise<IResponseType> {
+    try {
+      const savedMedias = await this.prisma.save_media.findMany({
+        where: {
+          user_id: +userId,
+          AND: [
+            {
+              OR: [
+                {
+                  media_id: idMedia || undefined,
+                },
+              ],
+            },
+          ],
+        },
+        select: {
+          id: true,
+          created_at: true,
+          media: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+              description: true,
+              created_at: true,
+              updated_at: true,
+              type: true,
+              user: {
+                select: {
+                  id: true,
+                  username: true,
+                  full_name: true,
+                  age: true,
+                  avatar: true,
+                  user_type: true,
+                  created_at: true,
+                  updated_at: true,
+                  is_ban: true,
+                },
+              },
+              image: {
+                select: {
+                  id: true,
+                  img_name: true,
+                  url: true,
+                  created_at: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return {
+        message: 'Get Saved Medias Success',
+        data: savedMedias,
+        statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
   async createComment(
     decodedAccessToken: IDecodedAccecssTokenType,
     mediaId: number,

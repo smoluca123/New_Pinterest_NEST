@@ -62,6 +62,21 @@ export const decoratorsGetSavedMedias = () =>
     }),
   );
 
+export const decoratorsGetSavedMediasByUserID = () =>
+  applyDecorators(
+    Roles([RolesLevel.MANAGER]),
+    ApiParam({
+      name: 'userId',
+      description: 'User ID',
+      required: true,
+    }),
+    ApiQuery({
+      name: 'id',
+      description: 'Media ID',
+      required: false,
+    }),
+  );
+
 export const decoratorsCreateComment = () =>
   applyDecorators(
     UseGuards(JwtTokenVerifyGuard),

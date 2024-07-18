@@ -37,6 +37,7 @@ import {
   decoratorsGetMediaList,
   decoratorsGetMediaUploadedByUserID,
   decoratorsGetSavedMedias,
+  decoratorsGetSavedMediasByUserID,
   decoratorsMediaUpload,
   decoratorsRemoveComment,
   decoratorsRemoveMedia,
@@ -110,6 +111,15 @@ export class MediaController {
   ): Promise<IResponseType> {
     const { decodedAccessToken } = req;
     return this.mediaService.getSavedMedias(decodedAccessToken, +mediaId);
+  }
+
+  @Get('get-saved-medias-user/:userId')
+  @decoratorsGetSavedMediasByUserID()
+  getSavedMediasByUserID(
+    @Query('id') mediaId: number | string,
+    @Param('userId') userId: number | string,
+  ): Promise<IResponseType> {
+    return this.mediaService.getSavedMediasByUserID(+userId, +mediaId);
   }
 
   @Post('create-comment/:id')
