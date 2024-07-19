@@ -146,7 +146,7 @@ export class UserService {
       const { id, username, key } = this.jwt.verify<IDecodedAccecssTokenType>(
         accessToken,
         {
-          ignoreExpiration: false,
+          ignoreExpiration: true,
         },
       );
 
