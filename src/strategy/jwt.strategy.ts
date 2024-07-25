@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         auth_code: payload.auth_code,
       },
     });
-    if (!auth) return new UnauthorizedException();
+    if (!auth) throw new UnauthorizedException();
     return payload;
   }
 }
