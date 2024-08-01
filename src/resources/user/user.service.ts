@@ -59,6 +59,7 @@ export class UserService {
           age: true,
           user_type: true,
           is_ban: true,
+          avatar: true,
           created_at: true,
           updated_at: true,
         },
