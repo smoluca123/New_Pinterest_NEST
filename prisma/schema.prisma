@@ -41,8 +41,9 @@ model comment {
   level         Int?
   reply_to      Int?
   media_id      Int?
+  replies       Int       @default(0)
   media         media?    @relation(fields: [media_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "media_id_media_id")
-  comment       comment?  @relation("commentTocomment", fields: [reply_to], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "replyto_comment_id")
+  comment       comment?  @relation("commentTocomment", fields: [reply_to], references: [id], onUpdate: SetNull, map: "replyto_comment_id")
   other_comment comment[] @relation("commentTocomment")
   user          user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_users_id")
 

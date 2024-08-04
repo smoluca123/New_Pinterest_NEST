@@ -481,7 +481,6 @@ export class MediaService {
       const { content, replyToCommentId } = commentData;
 
       let commentCreateData = {};
-      console.log(replyToCommentId);
       if (replyToCommentId) {
         const replyComment = await this.prisma.comment.findUnique({
           where: {
@@ -491,6 +490,18 @@ export class MediaService {
         });
         if (!replyComment)
           throw new NotFoundException('Reply Comment not found');
+
+        await this.prisma.comment.update({
+          where: {
+            id: replyComment.id,
+          },
+          data: {
+            replies: {
+              increment: 1,
+            },
+          },
+        });
+
         commentCreateData = {
           content,
           user_id: +userId,
