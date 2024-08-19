@@ -962,6 +962,19 @@ export class MediaService {
     if (comment.user_id !== +id)
       throw new ForbiddenException('You cannot remove this comment');
 
+    if (comment.reply_to) {
+      await this.prisma.comment.update({
+        where: {
+          id: comment.reply_to,
+        },
+        data: {
+          replies: {
+            decrement: 1,
+          },
+        },
+      });
+    }
+
     await this.prisma.comment.delete({
       where: {
         id: commentId,
@@ -992,6 +1005,19 @@ export class MediaService {
       });
 
       if (!comment) throw new NotFoundException('Comment not found');
+
+      if (comment.reply_to) {
+        await this.prisma.comment.update({
+          where: {
+            id: comment.reply_to,
+          },
+          data: {
+            replies: {
+              decrement: 1,
+            },
+          },
+        });
+      }
 
       await this.prisma.comment.delete({
         where: {
