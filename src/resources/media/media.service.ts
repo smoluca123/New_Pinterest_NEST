@@ -19,12 +19,14 @@ import { SupabaseService } from 'src/supabase/supabase.service';
 import { CreateCommentDto } from './dto/CreateComment.dto';
 import { DEFAULT_LIMIT } from 'src/global/constant.global';
 import { MediaUpdateAdminDto, MediaUpdateDto } from './dto/MediaUpdate.dto';
+import { CommentsGateway } from './gateways/comments.gateway';
 
 @Injectable()
 export class MediaService {
   constructor(
     private prisma: PrismaService,
     private supabase: SupabaseService,
+    private readonly commentsGateway: CommentsGateway,
   ) {}
 
   async getMediaList(
@@ -539,6 +541,11 @@ export class MediaService {
             },
           },
         },
+      });
+
+      this.commentsGateway.broadcastNewComment({
+        comment,
+        mediaId,
       });
 
       return {
