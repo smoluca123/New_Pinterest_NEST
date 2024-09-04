@@ -25,7 +25,7 @@ export interface IInfoApiType {
   author: string;
   version: string;
   description: string;
-  authorizationToken: string;
+  authorizationToken?: string;
   swagger: string;
 }
 

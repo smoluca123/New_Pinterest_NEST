@@ -28,6 +28,7 @@ import { MulterModule } from '@nestjs/platform-express';
     MulterModule.register({
       dest: './uploads',
     }),
+
     ThrottlerModule.forRoot([{ ttl: 2000, limit: 100 }]),
     PrismaModule,
     AuthModule,

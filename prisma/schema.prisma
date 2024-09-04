@@ -98,6 +98,7 @@ model user {
   is_ban        Int          @default(0)
   refresh_token String?      @db.VarChar(255)
   is_hidden     Int          @default(0)
+  is_active     Int?
   comment       comment[]
   media         media[]
   save_media    save_media[]
