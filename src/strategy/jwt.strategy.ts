@@ -22,7 +22,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const auth = await this.prisma.auth_code.findFirst({
       where: {
         id: payload.id,
-        auth_code: payload.auth_code,
+        AND: {
+          auth_code: payload.auth_code,
+        },
       },
     });
     if (!auth) throw new UnauthorizedException();

@@ -14,6 +14,7 @@ export class AppService {
     const authorizationToken: string = this.jwt.sign(authCode, {
       expiresIn: '30d',
     });
+
     return {
       name: 'Pinterest API',
       version: '1.0.0',

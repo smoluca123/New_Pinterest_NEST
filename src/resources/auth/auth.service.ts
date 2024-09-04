@@ -12,12 +12,15 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDto } from './dto/UserRegister.dto';
 import { handleDefaultError } from 'src/global/functions.global';
 import * as bcrypt from 'bcrypt';
+import { ACTIVE_STATUS } from './enums';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly emailService: EmailService,
   ) {}
   async login(credentials: UserLoginDto): Promise<IResponseType> {
     try {
@@ -35,6 +38,12 @@ export class AuthService {
       }
 
       if (checkUsername.is_ban) throw new ForbiddenException('User is banned!');
+      // if (!checkUsername.is_active)
+      //   throw new ForbiddenException({
+      //     message: 'Account has not been activated',
+      //     error: 'Account Not Activated',
+      //     statusCode: 403,
+      //   });
 
       const checkPassword = bcrypt.compareSync(
         password,
@@ -126,6 +135,7 @@ export class AuthService {
           password: hashPassword,
           created_at: time,
           updated_at: time,
+          is_active: ACTIVE_STATUS.IS_ACTIVE,
         },
         include: {
           user_type: true,
@@ -165,6 +175,18 @@ export class AuthService {
           refresh_token: refreshToken,
         },
       });
+
+      const mailContent = this.emailService.compileTemplate('/register/html', {
+        name: createdUser.full_name,
+        confirmationLink: '#',
+      });
+
+      await this.emailService.sendEmail(
+        createdUser.email,
+        `Pinterest - Active Account`,
+        mailContent,
+      );
+
       return {
         message: 'Sign up successfully!',
         data: { ...userResult, accessToken },
