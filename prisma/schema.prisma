@@ -85,24 +85,25 @@ model media {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model user {
-  id            Int          @id @default(autoincrement())
-  username      String?      @db.VarChar(255)
-  email         String?      @db.VarChar(255)
-  type          Int          @default(1)
-  full_name     String?      @db.VarChar(255)
-  avatar        String?      @db.VarChar(500)
+  id            Int           @id @default(autoincrement())
+  username      String?       @db.VarChar(255)
+  email         String?       @db.VarChar(255)
+  type          Int           @default(1)
+  full_name     String?       @db.VarChar(255)
+  avatar        String?       @db.VarChar(500)
   age           Int?
-  password      String?      @db.VarChar(255)
-  created_at    DateTime?    @db.DateTime(0)
-  updated_at    DateTime?    @db.DateTime(0)
-  is_ban        Int          @default(0)
-  refresh_token String?      @db.VarChar(255)
-  is_hidden     Int          @default(0)
-  is_active     Int?
+  password      String?       @db.VarChar(255)
+  created_at    DateTime?     @db.DateTime(0)
+  updated_at    DateTime?     @db.DateTime(0)
+  is_ban        Int           @default(0)
+  refresh_token String?       @db.VarChar(255)
+  is_hidden     Int           @default(0)
+  is_active     Int           @default(0)
+  active_code   active_code[]
   comment       comment[]
   media         media[]
   save_media    save_media[]
-  user_type     user_type    @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "type_usertypes")
+  user_type     user_type     @relation(fields: [type], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "type_usertypes")
 
   @@index([type], map: "type_usertypes")
 }
@@ -123,6 +124,18 @@ model save_media {
 
   @@index([media_id], map: "mediaid_media_id")
   @@index([user_id], map: "userid_user_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model active_code {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  code       String?  @db.VarChar(255)
+  expires_at DateTime @db.Timestamp(0)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+  user       user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_id_user_id")
+
+  @@index([user_id], map: "user_id_user_id")
 }
 
 enum media_type {
