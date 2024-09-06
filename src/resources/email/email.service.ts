@@ -3,9 +3,12 @@ import * as MailPace from '@mailpace/mailpace.js';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class EmailService {
+  constructor(private mailerService: MailerService) {}
+
   compileTemplate(templateName: string, context: any): string {
     const templatePath = path.join(
       __dirname,
@@ -17,31 +20,60 @@ export class EmailService {
     return template(context);
   }
 
-  async sendEmail(to: string, subject: string, htmlbody: string) {
+  async sendEmail({
+    from = 'SMOTeam <admin@support.smoteam.com>',
+    to,
+    subject,
+    htmlbody,
+  }: {
+    from?: string;
+    to: string;
+    subject: string;
+    htmlbody: string;
+  }) {
+    const fromArgs = from.split('@');
+
+    if (!fromArgs.pop().includes('support.smoteam.com'))
+      throw new Error('Mail is not supported');
+
     const client = new MailPace.DomainClient(
       '028500a7-0cc1-428b-a42c-5a9f0abac42d',
     );
 
-    // const htmlbody = this.compileTemplate('/register/html', {
-    //   name: 'register',
-    //   confirmationLink: 'aaa',
-    // });
+    try {
+      const data = await client.sendEmail({
+        from: from || 'admin@support.smoteam.com',
+        to,
+        subject,
+        htmlbody,
+      });
 
-    const data = await client.sendEmail({
-      from: 'admin@support.smoteam.com',
-      to,
-      subject,
-      htmlbody,
+      return data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+
+  async sendActiveAccountEmail({
+    email,
+    context,
+  }: {
+    email: string;
+    context: {
+      name: string;
+      verification_code: string;
+      confirmationLink?: string;
+    };
+  }) {
+    await this.mailerService.sendMail({
+      to: email,
+      subject: `Pinterest - Active Account`,
+      template: './register/html',
+      context: {
+        ...context,
+        // confirmationLink: context.confirmationLink || '#',
+      },
     });
-
-    return data;
-
-    // await this.mailerService.sendMail({
-    //   to, // địa chỉ email người nhận
-    //   subject, // chủ đề email
-    //   //   template, // tên template
-    //   //   context, // dữ liệu context cho template
-    //   html: '<h1>Hellodggdg</h1>',
-    // });
   }
 }

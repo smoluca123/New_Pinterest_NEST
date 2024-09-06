@@ -347,6 +347,9 @@ export class MediaService {
           user_id: +id,
           AND: [
             {
+              media: {
+                is_hidden: 0,
+              },
               OR: [
                 {
                   media_id: idMedia || undefined,

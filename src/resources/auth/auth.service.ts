@@ -10,10 +10,16 @@ import { UserLoginDto } from './dto/UserLogin.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserRegisterDto } from './dto/UserRegister.dto';
-import { handleDefaultError } from 'src/global/functions.global';
+import {
+  generateSecureVerificationCode,
+  handleDefaultError,
+} from 'src/global/functions.global';
 import * as bcrypt from 'bcrypt';
 import { ACTIVE_STATUS } from './enums';
 import { EmailService } from '../email/email.service';
+import { SendActivationMailDto } from './dto/SendMail.dto';
+import { isPast } from 'date-fns';
+import { ActivationByCodeDto } from './dto/ActivationByCode.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,12 +44,12 @@ export class AuthService {
       }
 
       if (checkUsername.is_ban) throw new ForbiddenException('User is banned!');
-      // if (!checkUsername.is_active)
-      //   throw new ForbiddenException({
-      //     message: 'Account has not been activated',
-      //     error: 'Account Not Activated',
-      //     statusCode: 403,
-      //   });
+      if (!checkUsername.is_active)
+        throw new ForbiddenException({
+          message: 'Account has not been activated',
+          error: 'ACCOUNT_NOT_ACTIVATED',
+          statusCode: 403,
+        });
 
       const checkPassword = bcrypt.compareSync(
         password,
@@ -152,11 +158,11 @@ export class AuthService {
       } = createdUser;
       /* eslint-enable @typescript-eslint/no-unused-vars*/
 
-      const accessToken = await this.jwt.signAsync({
-        id: createdUser.id,
-        username: createdUser.username,
-        key: time.getTime(),
-      });
+      // const accessToken = await this.jwt.signAsync({
+      //   id: createdUser.id,
+      //   username: createdUser.username,
+      //   key: time.getTime(),
+      // });
       const refreshToken = await this.jwt.signAsync(
         {
           id: createdUser.id,
@@ -176,25 +182,194 @@ export class AuthService {
         },
       });
 
-      const mailContent = this.emailService.compileTemplate('/register/html', {
-        name: createdUser.full_name,
-        confirmationLink: '#',
+      await this.sendActivationMail({
+        userId: createdUser.id,
       });
 
-      await this.emailService.sendEmail(
-        createdUser.email,
-        `Pinterest - Active Account`,
-        mailContent,
-      );
-
       return {
-        message: 'Sign up successfully!',
-        data: { ...userResult, accessToken },
+        message:
+          'Sign up successfully! Check email and activate your account please!',
+        data: { ...userResult },
         statusCode: 201,
         date: new Date(),
       };
     } catch (error) {
       console.log(error);
+      handleDefaultError(error);
+    }
+  }
+
+  async sendActivationMail(
+    data: SendActivationMailDto,
+  ): Promise<IResponseType> {
+    try {
+      const EXPIRATION_MINUTES = 10;
+      const { userId } = data;
+      const currentDate = new Date();
+
+      const checkUser = await this.prisma.user.findFirst({
+        where: {
+          id: +userId,
+        },
+      });
+      const checkCode = await this.prisma.active_code.findFirst({
+        where: {
+          user_id: +userId,
+          // AND: {
+          //   expires_at: {
+          //     gt: currentDate,
+          //   },
+          // },
+        },
+      });
+
+      if (!checkUser) throw new NotFoundException('User not found');
+      if (checkUser.is_active)
+        throw new BadRequestException('User is already active');
+
+      const activeCode = checkCode?.code || generateSecureVerificationCode();
+
+      if (!checkCode) {
+        await this.prisma.active_code.create({
+          data: {
+            user_id: +userId,
+            code: activeCode,
+            expires_at: new Date(
+              currentDate.getTime() + EXPIRATION_MINUTES * 60 * 1000,
+            ),
+            created_at: currentDate,
+          },
+        });
+      } else {
+        const isExpired = isPast(new Date(checkCode.expires_at));
+        if (isExpired) {
+          await this.prisma.active_code.update({
+            data: {
+              code: generateSecureVerificationCode(),
+              expires_at: new Date(
+                currentDate.getTime() + EXPIRATION_MINUTES * 60 * 1000,
+              ),
+              created_at: currentDate,
+            },
+            where: {
+              id: checkCode.id,
+            },
+          });
+        }
+      }
+
+      await this.emailService.sendActiveAccountEmail({
+        email: checkUser.email,
+        context: {
+          name: checkUser.full_name,
+          // confirmationLink: '#test',
+          verification_code: activeCode,
+        },
+      });
+
+      return {
+        statusCode: 204,
+        data: null,
+        message:
+          'Account verification email has been sent to your email : ' +
+          checkUser.email,
+        date: currentDate,
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async activationByCode({
+    userId,
+    code,
+  }: ActivationByCodeDto): Promise<IResponseType> {
+    try {
+      const checkUser = await this.prisma.user.findFirst({
+        where: {
+          id: userId,
+        },
+        include: {
+          user_type: {
+            select: {
+              id: true,
+              type_name: true,
+            },
+          },
+        },
+      });
+      const checkCode = await this.prisma.active_code.findFirst({
+        where: {
+          user_id: userId,
+          AND: {
+            code,
+            // expires_at: {
+            //   gt: currentDate,
+            // },
+          },
+        },
+      });
+
+      if (!checkUser) throw new NotFoundException('User not found');
+      if (checkUser.is_active)
+        throw new BadRequestException('User is already active');
+      if (!checkCode)
+        throw new BadRequestException('Verification code is invalid');
+
+      const isExpired = isPast(checkCode.expires_at);
+      if (isExpired)
+        throw new BadRequestException(
+          'Verification code is expired, resend to try again',
+        );
+
+      const key = new Date().getTime();
+      const accessToken = await this.jwt.signAsync({
+        id: checkUser.id,
+        username: checkUser.username,
+        key,
+      });
+      const refreshToken = await this.jwt.signAsync(
+        {
+          id: checkUser.id,
+          username: checkUser.username,
+          key,
+        },
+        {
+          expiresIn: '30d',
+        },
+      );
+      await this.prisma.user.update({
+        data: {
+          is_active: 1,
+          refresh_token: refreshToken,
+        },
+        where: {
+          id: checkUser.id,
+        },
+      });
+      await this.prisma.active_code.delete({
+        where: {
+          id: checkCode.id,
+        },
+      });
+
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      const {
+        password: _pw,
+        refresh_token,
+        type,
+        is_ban,
+        ...userResult
+      } = checkUser;
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+
+      return {
+        statusCode: 200,
+        message: 'Account activated successfully',
+        data: { ...userResult, accessToken },
+        date: new Date(),
+      };
+    } catch (error) {
       handleDefaultError(error);
     }
   }

@@ -13,6 +13,7 @@ import { AuthModule } from './resources/auth/auth.module';
 import { MediaModule } from './resources/media/media.module';
 import { UserModule } from './resources/user/user.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { EmailModule } from './resources/email/email.module';
 
 @Module({
   imports: [
@@ -28,12 +29,12 @@ import { MulterModule } from '@nestjs/platform-express';
     MulterModule.register({
       dest: './uploads',
     }),
-
     ThrottlerModule.forRoot([{ ttl: 2000, limit: 100 }]),
     PrismaModule,
     AuthModule,
     UserModule,
     MediaModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [
