@@ -141,7 +141,7 @@ export class AuthService {
           password: hashPassword,
           created_at: time,
           updated_at: time,
-          is_active: ACTIVE_STATUS.IS_ACTIVE,
+          is_active: ACTIVE_STATUS.IS_INACTIVE,
         },
         include: {
           user_type: true,
