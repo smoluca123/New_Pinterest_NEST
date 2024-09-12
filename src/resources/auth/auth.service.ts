@@ -54,15 +54,15 @@ export class AuthService {
       /* eslint-enable @typescript-eslint/no-unused-vars */
 
       if (checkUsername.is_ban) throw new ForbiddenException('User is banned!');
-      if (!checkUsername.is_active)
-        throw new ForbiddenException({
-          message: 'Account has not been activated',
-          data: {
-            ...userResult,
-          },
-          error: 'ACCOUNT_NOT_ACTIVATED',
-          statusCode: 403,
-        });
+      // if (!checkUsername.is_active)
+      //   throw new ForbiddenException({
+      //     message: 'Account has not been activated',
+      //     data: {
+      //       ...userResult,
+      //     },
+      //     error: 'ACCOUNT_NOT_ACTIVATED',
+      //     statusCode: 403,
+      //   });
 
       const checkPassword = bcrypt.compareSync(
         password,
