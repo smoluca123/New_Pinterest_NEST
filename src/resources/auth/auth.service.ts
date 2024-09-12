@@ -341,7 +341,7 @@ export class AuthService {
           expiresIn: '30d',
         },
       );
-      await this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         data: {
           is_active: 1,
           refresh_token: refreshToken,
@@ -363,7 +363,7 @@ export class AuthService {
         type,
         is_ban,
         ...userResult
-      } = checkUser;
+      } = updatedUser;
       /* eslint-enable @typescript-eslint/no-unused-vars */
 
       return {
