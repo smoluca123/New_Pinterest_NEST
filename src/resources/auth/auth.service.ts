@@ -58,7 +58,7 @@ export class AuthService {
         throw new ForbiddenException({
           message: 'Account has not been activated',
           data: {
-            ...checkUsername,
+            ...userResult,
           },
           error: 'ACCOUNT_NOT_ACTIVATED',
           statusCode: 403,
