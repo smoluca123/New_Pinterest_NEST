@@ -43,10 +43,23 @@ export class AuthService {
         throw new NotFoundException('User not found!');
       }
 
+      /* eslint-disable @typescript-eslint/no-unused-vars */
+      const {
+        password: _pw,
+        is_ban,
+        refresh_token,
+        type,
+        ...userResult
+      } = checkUsername;
+      /* eslint-enable @typescript-eslint/no-unused-vars */
+
       if (checkUsername.is_ban) throw new ForbiddenException('User is banned!');
       if (!checkUsername.is_active)
         throw new ForbiddenException({
           message: 'Account has not been activated',
+          data: {
+            ...checkUsername,
+          },
           error: 'ACCOUNT_NOT_ACTIVATED',
           statusCode: 403,
         });
@@ -58,16 +71,6 @@ export class AuthService {
       if (!checkPassword) {
         throw new BadRequestException('Wrong password!');
       }
-
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      const {
-        password: _pw,
-        is_ban,
-        refresh_token,
-        type,
-        ...userResult
-      } = checkUsername;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
 
       const key = new Date().getTime();
       const accessToken = await this.jwt.signAsync({
