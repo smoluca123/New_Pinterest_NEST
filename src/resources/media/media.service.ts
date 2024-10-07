@@ -480,6 +480,7 @@ export class MediaService {
     commentData: CreateCommentDto,
   ): Promise<IResponseType> {
     try {
+      const MAX_LEVEL_COMMENT = 1;
       if (!mediaId) throw new NotFoundException('Media ID is required');
 
       const { id: userId } = decodedAccessToken;
@@ -511,7 +512,10 @@ export class MediaService {
           content,
           user_id: +userId,
           media_id: mediaId,
-          level: replyComment.level < 4 ? replyComment.level + 1 : 4, //Max level : 4
+          level:
+            replyComment.level < MAX_LEVEL_COMMENT
+              ? replyComment.level + 1
+              : MAX_LEVEL_COMMENT, //Max level : 1
           created_at: new Date(),
           updated_at: new Date(),
           reply_to: replyToCommentId,
