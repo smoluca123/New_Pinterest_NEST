@@ -50,4 +50,30 @@ export class SupabaseService {
       throw new Error(`Lỗi khi upload file: ${error.message}`);
     }
   }
+
+  async uploadFile(file: Express.Multer.File): Promise<{
+    id: string;
+    path: string;
+    fileName: string;
+    fullPath: string;
+    url: string;
+  }> {
+    try {
+      const { originalname, buffer } = file;
+      const fileName = new Date().getTime() + '_' + originalname;
+      const sanitizedFileName = sanitizeFileName(fileName);
+      const { data } = await this.supabase.storage
+        .from(this.supabaseBucket)
+        .upload(sanitizedFileName, buffer, {
+          contentType: file.mimetype,
+        });
+      return {
+        ...data,
+        url: `${imageSupabasePath + data.fullPath}`,
+        fileName: sanitizedFileName,
+      };
+    } catch (error) {
+      throw new Error(`Lỗi khi upload file: ${error.message}`);
+    }
+  }
 }

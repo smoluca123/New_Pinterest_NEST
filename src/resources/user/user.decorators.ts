@@ -1,10 +1,19 @@
-import { UseGuards, applyDecorators } from '@nestjs/common';
-import { ApiHeader, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { UseGuards, UseInterceptors, applyDecorators } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiHeader,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 import { ApiQueryLimitAndPage } from 'src/decorators/global.decorators';
 import { Roles } from 'src/decorators/roles.decorator';
 import { JwtTokenVerifyGuard } from 'src/guards/jwt-token-verify.guard';
 import { RolesLevel } from 'src/interfaces/interfaces.global';
+import { UserAvatarUpdateDto } from 'src/resources/user/dto/UserUpdate.dto';
 
 export const decoratorsListUsers = () =>
   applyDecorators(
@@ -104,6 +113,35 @@ export const decoratorsUpdateInfoByID = () =>
       name: 'id',
       description: 'User ID',
     }),
+  );
+
+export const decoratorsUpdateUserAvatar = () =>
+  applyDecorators(
+    ApiOperation({
+      summary: 'User Update Avatar API',
+      description: 'Update user avatar',
+    }),
+    ApiConsumes('multipart/form-data'),
+    ApiParam({ name: 'id', description: 'User ID' }),
+    ApiBody({ type: UserAvatarUpdateDto }),
+    UseInterceptors(
+      FileInterceptor('file', {
+        // storage: multer.memoryStorage(),
+        limits: {
+          fileSize: 1024 * 1024 * 50, //50MB
+        },
+        fileFilter(req, file, cb) {
+          // /^.*\.(jpg|jpeg|png|gif|bmp|webp)$/i
+          if (!file.mimetype.match('image/*')) {
+            console.log('Cancel upload, file not support');
+            // Block image upload in public/img folder
+            cb(null, false);
+          } else {
+            cb(null, true);
+          }
+        },
+      }),
+    ),
   );
 
 export const decoratorsDeleteUser = () =>

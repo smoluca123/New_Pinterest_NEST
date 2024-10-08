@@ -4,12 +4,15 @@ import {
   Delete,
   Get,
   Headers,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
   Req,
   Request,
+  UploadedFile,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -34,7 +37,9 @@ import {
   decoratorsRefreshToken,
   decoratorsUpdateInfo,
   decoratorsUpdateInfoByID,
+  decoratorsUpdateUserAvatar,
 } from './user.decorators';
+import { FileIsImageValidationPipe } from 'src/pipes/ImageTypeValidator.pipe';
 
 @ApiTags('User Managements')
 @ApiBearerAuth()
@@ -105,6 +110,26 @@ export class UserController {
     @Body() userInfo: UserUpdateDto,
   ): Promise<IResponseType> {
     return this.userService.updateUser(+userId, userInfo);
+  }
+
+  @Post('/update-user-avatar/:id')
+  @decoratorsUpdateUserAvatar()
+  postUpdateUserAvatar(
+    @Param('id') userId: string | number,
+    @UploadedFile(
+      FileIsImageValidationPipe,
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({
+            maxSize: 1024 * 1024 * 50,
+            message: 'File size is too large, max 50MB',
+          }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ): Promise<IResponseType> {
+    return this.userService.updateUserAvatar({ userId, file });
   }
 
   @Delete('/delete-user/:id')

@@ -18,12 +18,14 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { DEFAULT_LIMIT } from 'src/global/constant.global';
+import { SupabaseService } from 'src/supabase/supabase.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
+    private readonly supabase: SupabaseService,
   ) {}
 
   async getListUsers(
@@ -401,6 +403,61 @@ export class UserService {
         message: 'Update user successfully!',
         statusCode: 200,
         data: { ...userResult, accessToken },
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async updateUserAvatar({
+    userId,
+    file,
+  }: {
+    userId: string | number;
+    file: Express.Multer.File;
+  }) {
+    try {
+      // TODO: Implement avatar upload and deletion logic here
+
+      if (!userId) throw new BadRequestException('User ID is required!');
+
+      const checkUser = await this.prisma.user.findUnique({
+        where: {
+          id: +userId,
+        },
+      });
+      if (!checkUser) throw new NotFoundException('User not found!');
+
+      // TODO: Upload user avatar in the supabase storage service
+      const { url } = await this.supabase.uploadFile(file);
+
+      const updatedUser = await this.prisma.user.update({
+        where: {
+          id: +userId,
+        },
+        data: {
+          avatar: url,
+        },
+        include: {
+          user_type: true,
+        },
+      });
+
+      const {
+        /* eslint-disable @typescript-eslint/no-unused-vars*/
+        password: _pw,
+        refresh_token,
+        type,
+        is_ban,
+        ...resultUser
+      } = updatedUser;
+      /* eslint-enable @typescript-eslint/no-unused-vars*/
+
+      return {
+        message: 'Update user avatar successfully!',
+        statusCode: 200,
+        data: resultUser,
         date: new Date(),
       };
     } catch (error) {

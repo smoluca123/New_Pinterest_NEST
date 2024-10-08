@@ -28,7 +28,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { MediaUploadDto } from './dto/MediaUpload.dto';
-import { FileIsImageValidationPipe } from 'src/pipes/ImageTypeValidator.pipe';
+import { FilesIsImageValidationPipe } from 'src/pipes/ImageTypeValidator.pipe';
 import { CreateCommentDto } from './dto/CreateComment.dto';
 import {
   decoratorsCreateComment,
@@ -141,7 +141,7 @@ export class MediaController {
   @decoratorsMediaUpload()
   async mediaUpload(
     @UploadedFiles(
-      FileIsImageValidationPipe,
+      FilesIsImageValidationPipe,
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({
