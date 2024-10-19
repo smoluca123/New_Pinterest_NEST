@@ -60,6 +60,7 @@ export const decoratorsGetSavedMedias = () =>
       description: 'Media ID',
       required: false,
     }),
+    ApiQueryLimitAndPage(),
   );
 
 export const decoratorsGetSavedMediasByUserID = () =>
@@ -75,6 +76,7 @@ export const decoratorsGetSavedMediasByUserID = () =>
       description: 'Media ID',
       required: false,
     }),
+    ApiQueryLimitAndPage(),
   );
 
 export const decoratorsCreateComment = () =>
