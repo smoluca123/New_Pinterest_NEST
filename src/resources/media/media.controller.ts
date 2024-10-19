@@ -108,9 +108,16 @@ export class MediaController {
   getSavedMedias(
     @Request() req: IRequestWithDecodedAccessToken,
     @Query('id') mediaId: number | string,
+    @Query('limit') limit: string | number,
+    @Query('page') page: string | number,
   ): Promise<IResponseType> {
     const { decodedAccessToken } = req;
-    return this.mediaService.getSavedMedias(decodedAccessToken, +mediaId);
+    return this.mediaService.getSavedMedias(
+      decodedAccessToken,
+      +mediaId,
+      +limit,
+      +page,
+    );
   }
 
   @Get('get-saved-medias-user/:userId')
@@ -118,8 +125,15 @@ export class MediaController {
   getSavedMediasByUserID(
     @Query('id') mediaId: number | string,
     @Param('userId') userId: number | string,
+    @Query('limit') limit: string | number,
+    @Query('page') page: string | number,
   ): Promise<IResponseType> {
-    return this.mediaService.getSavedMediasByUserID(+userId, +mediaId);
+    return this.mediaService.getSavedMediasByUserID(
+      +userId,
+      +mediaId,
+      +limit,
+      +page,
+    );
   }
 
   @Post('create-comment/:id')

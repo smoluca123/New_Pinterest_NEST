@@ -338,26 +338,37 @@ export class MediaService {
   async getSavedMedias(
     decodedAccessToken: IDecodedAccecssTokenType,
     idMedia: number,
+    limit: number,
+    page: number,
   ): Promise<IResponseType> {
     try {
+      limit = limit ? +limit : DEFAULT_LIMIT;
+      page = page ? +page : 1;
+
       const { id } = decodedAccessToken;
 
-      const savedMedias = await this.prisma.save_media.findMany({
-        where: {
-          user_id: +id,
-          AND: [
-            {
-              media: {
-                is_hidden: 0,
-              },
-              OR: [
-                {
-                  media_id: idMedia || undefined,
-                },
-              ],
+      const whereQuery = {
+        user_id: +id,
+        AND: [
+          {
+            media: {
+              is_hidden: 0,
             },
-          ],
-        },
+            OR: [
+              {
+                media_id: idMedia || undefined,
+              },
+            ],
+          },
+        ],
+      };
+
+      const totalItems = await this.prisma.save_media.count({
+        where: whereQuery,
+      });
+
+      const savedMedias = await this.prisma.save_media.findMany({
+        where: whereQuery,
         select: {
           id: true,
           created_at: true,
@@ -394,11 +405,18 @@ export class MediaService {
             },
           },
         },
+        take: limit,
+        skip: (page - 1) * limit,
       });
 
       return {
         message: 'Get Saved Medias Success',
-        data: savedMedias,
+        data: {
+          currentPage: page,
+          totalPage: Math.ceil(totalItems / limit),
+          totalItems,
+          items: savedMedias,
+        },
         statusCode: 200,
         date: new Date(),
       };
@@ -410,21 +428,35 @@ export class MediaService {
   async getSavedMediasByUserID(
     userId: number,
     idMedia: number,
+    limit: number,
+    page: number,
   ): Promise<IResponseType> {
     try {
-      const savedMedias = await this.prisma.save_media.findMany({
-        where: {
-          user_id: +userId,
-          AND: [
-            {
-              OR: [
-                {
-                  media_id: idMedia || undefined,
-                },
-              ],
+      limit = limit ? +limit : DEFAULT_LIMIT;
+      page = page ? +page : 1;
+
+      const whereQuery = {
+        user_id: userId,
+        AND: [
+          {
+            media: {
+              is_hidden: 0,
             },
-          ],
-        },
+            OR: [
+              {
+                media_id: idMedia || undefined,
+              },
+            ],
+          },
+        ],
+      };
+
+      const totalItems = await this.prisma.save_media.count({
+        where: whereQuery,
+      });
+
+      const savedMedias = await this.prisma.save_media.findMany({
+        where: whereQuery,
         select: {
           id: true,
           created_at: true,
@@ -461,11 +493,18 @@ export class MediaService {
             },
           },
         },
+        take: limit,
+        skip: (page - 1) * limit,
       });
 
       return {
         message: 'Get Saved Medias Success',
-        data: savedMedias,
+        data: {
+          currentPage: page,
+          totalPage: Math.ceil(totalItems / limit),
+          totalItems,
+          items: savedMedias,
+        },
         statusCode: 200,
         date: new Date(),
       };
