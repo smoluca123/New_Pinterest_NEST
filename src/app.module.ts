@@ -14,6 +14,7 @@ import { MediaModule } from './resources/media/media.module';
 import { UserModule } from './resources/user/user.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { EmailModule } from './resources/email/email.module';
+import { AuthGuard } from '@nestjs/passport';
 
 @Module({
   imports: [
@@ -44,6 +45,10 @@ import { EmailModule } from './resources/email/email.module';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard('jwt'),
+    // },
   ],
 })
 export class AppModule {}

@@ -11,7 +11,7 @@
  Target Server Version : 80033 (8.0.33-25)
  File Encoding         : 65001
 
- Date: 12/10/2024 14:06:27
+ Date: 25/11/2024 16:51:30
 */
 
 SET NAMES utf8mb4;
@@ -30,7 +30,7 @@ CREATE TABLE `active_code`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id_user_id`(`user_id` ASC) USING BTREE,
   CONSTRAINT `user_id_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 44 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 68 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of active_code
@@ -46,6 +46,10 @@ INSERT INTO `active_code` VALUES (29, 74, 'A2E05E', '2024-09-18 15:28:20', '2024
 INSERT INTO `active_code` VALUES (38, 77, '44020E', '2024-09-20 09:03:43', '2024-09-20 08:53:43');
 INSERT INTO `active_code` VALUES (40, 8, '2ADC57', '2024-09-25 13:44:31', '2024-09-25 13:34:31');
 INSERT INTO `active_code` VALUES (41, 79, 'EB72D6', '2024-09-26 14:26:01', '2024-09-26 14:16:01');
+INSERT INTO `active_code` VALUES (45, 80, '586D02', '2024-11-20 06:59:14', '2024-11-20 06:49:14');
+INSERT INTO `active_code` VALUES (46, 81, 'A971DA', '2024-11-20 07:09:16', '2024-11-20 06:59:16');
+INSERT INTO `active_code` VALUES (47, 82, '9B2577', '2024-11-20 07:37:20', '2024-11-20 07:27:20');
+INSERT INTO `active_code` VALUES (49, 6, '63974C', '2024-11-20 08:42:29', '2024-11-20 08:32:29');
 
 -- ----------------------------
 -- Table structure for auth_code
@@ -121,13 +125,13 @@ CREATE TABLE `comment`  (
   CONSTRAINT `media_id_media_id` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `replyto_comment_id` FOREIGN KEY (`reply_to`) REFERENCES `comment` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `user_id_users_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 378 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 456 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of comment
 -- ----------------------------
 INSERT INTO `comment` VALUES (1, 'Đẹp quá <3', 1, '2024-07-05 00:14:35', '2024-07-05 00:14:38', 0, NULL, 19, 1);
-INSERT INTO `comment` VALUES (6, 'Đẹp dữ chờiiiii', 4, '2024-07-05 08:01:52', '2024-07-05 08:01:52', 0, NULL, 18, 16);
+INSERT INTO `comment` VALUES (6, 'Đẹp dữ chờiiiii', 4, '2024-07-05 08:01:52', '2024-07-05 08:01:52', 0, NULL, 18, 24);
 INSERT INTO `comment` VALUES (11, 'ừ, công nhận!', 4, '2024-07-05 08:05:16', '2024-07-05 08:05:16', 1, 1, 19, 0);
 INSERT INTO `comment` VALUES (13, 'đóm cute phô mai que nạp 5 tỷ rolll đóm', 12, '2024-07-11 04:25:17', '2024-07-11 04:25:17', 0, NULL, 27, 0);
 INSERT INTO `comment` VALUES (14, 'vân tư   mãi đỉnh :)) qua tàu lấy vân tư', 12, '2024-07-11 04:27:12', '2024-07-11 04:27:12', 0, NULL, 20, 1);
@@ -207,7 +211,6 @@ INSERT INTO `comment` VALUES (350, ' ok bạn', 40, '2024-09-03 07:04:20', '2024
 INSERT INTO `comment` VALUES (351, ' bạn này xinh quá', 13, '2024-09-03 07:06:15', '2024-09-03 07:06:15', 0, NULL, 51, 0);
 INSERT INTO `comment` VALUES (354, '60 rolll vẫn lệch', 8, '2024-09-04 05:48:05', '2024-09-04 05:48:05', 0, NULL, 27, 0);
 INSERT INTO `comment` VALUES (360, 'lâu r không chơi lại game ? hsr giờ có gì mới không tác giả', 13, '2024-09-20 09:20:18', '2024-09-20 09:20:18', 0, NULL, 27, 0);
-INSERT INTO `comment` VALUES (376, 'hi', 75, '2024-10-07 09:03:28', '2024-10-07 09:03:28', 1, 85, 18, 0);
 INSERT INTO `comment` VALUES (377, 'dep phet', 66, '2024-10-09 15:40:51', '2024-10-09 15:40:51', 0, NULL, 20, 0);
 
 -- ----------------------------
@@ -351,7 +354,7 @@ CREATE TABLE `save_media`  (
   INDEX `userid_user_id`(`user_id` ASC) USING BTREE,
   CONSTRAINT `mediaid_media_id` FOREIGN KEY (`media_id`) REFERENCES `media` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `userid_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 216 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 221 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of save_media
@@ -372,13 +375,13 @@ INSERT INTO `save_media` VALUES (83, 33, 8, '2024-07-15 11:32:52');
 INSERT INTO `save_media` VALUES (87, 39, 13, '2024-07-18 15:08:44');
 INSERT INTO `save_media` VALUES (103, 33, 13, '2024-07-23 05:13:50');
 INSERT INTO `save_media` VALUES (105, 47, 13, '2024-08-04 06:11:53');
-INSERT INTO `save_media` VALUES (190, 18, 1, '2024-08-19 08:38:30');
 INSERT INTO `save_media` VALUES (193, 31, 13, '2024-09-03 04:08:44');
 INSERT INTO `save_media` VALUES (194, 40, 40, '2024-09-03 07:01:31');
 INSERT INTO `save_media` VALUES (196, 18, 40, '2024-09-03 07:04:48');
 INSERT INTO `save_media` VALUES (197, 40, 13, '2024-09-04 05:38:06');
 INSERT INTO `save_media` VALUES (199, 18, 66, '2024-09-06 17:37:56');
 INSERT INTO `save_media` VALUES (200, 18, 67, '2024-09-10 17:46:39');
+INSERT INTO `save_media` VALUES (220, 18, 1, '2024-10-19 14:51:48');
 
 -- ----------------------------
 -- Table structure for user
@@ -402,12 +405,12 @@ CREATE TABLE `user`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `type_usertypes`(`type` ASC) USING BTREE,
   CONSTRAINT `type_usertypes` FOREIGN KEY (`type`) REFERENCES `user_type` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 80 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 95 CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'usertest1', 'usertest1@gmail.com', 2, 'User Test', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/DreamShaper_v6_Woman_with_platinum_hair_in_a_dress_of_ice_flow_1.jpg', 55, '$2b$10$zFCQ2Dd09UsmXOTBJjZ.E.8pEK5J241/CaT5qPu1hh6AfDZBzPjFi', '2024-06-22 00:13:32', '2024-07-01 04:20:45', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VydGVzdDEiLCJrZXkiOjE3Mjg2NTY2ODEzNjksImlhdCI6MTcyODY1NjY4MSwiZXhwIjoxNzMxMjQ4NjgxfQ.W7Ddbdi5BZ5FuN5gLhPsVDAcN4trDAQC4ta3owlenIE', 0, 0);
+INSERT INTO `user` VALUES (1, 'usertest1', 'usertest1@gmail.com', 2, 'User Test1', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/1731394098678_1731394100185_image', 22, '$2b$10$zFCQ2Dd09UsmXOTBJjZ.E.8pEK5J241/CaT5qPu1hh6AfDZBzPjFi', '2024-06-22 00:13:32', '2024-11-12 06:46:44', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJ1c2VydGVzdDEiLCJrZXkiOjE3MzI0NzY0NDYyNTAsImlhdCI6MTczMjQ3NjQ0NiwiZXhwIjoxNzM1MDY4NDQ2fQ.2A8iiDAjLF41cWGgP7moe0ux0fQrPlKbffdCRZ13wo0', 0, 1);
 INSERT INTO `user` VALUES (4, 'usertest2', 'usertest2@gmail.com', 1, 'User Test 2', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/DreamShaper_v6_Woman_with_platinum_hair_in_a_dress_of_ice_flow_1.jpg', 22, '$2b$10$zFCQ2Dd09UsmXOTBJjZ.E.8pEK5J241/CaT5qPu1hh6AfDZBzPjFi', '2024-06-21 18:34:00', '2024-08-06 14:42:22', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwidXNlcm5hbWUiOiJ1c2VydGVzdDIiLCJrZXkiOjE3MjYxNDkwMzczNTQsImlhdCI6MTcyNjE0OTAzNywiZXhwIjoxNzI4NzQxMDM3fQ.jrQ7Vqiqt2VTXtuvaBA2F_Rl_u7xg18lkDaomv-ZlXE', 0, 0);
 INSERT INTO `user` VALUES (5, 'kieulinh123', 'ogyminecraft497@gmail.com', 1, 'dang haong thien an', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/DreamShaper_v6_Woman_with_platinum_hair_in_a_dress_of_ice_flow_1.jpg', 22, '$2b$10$ZRo1v7zFs95tEHvLLAj8..yQ6O1T2hUhra8004Im01Z0AcENGT3X.', '2024-06-22 13:56:19', '2024-06-22 13:56:19', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwidXNlcm5hbWUiOiJraWV1bGluaDEyMyIsImtleSI6MTcyNjgyMTM1MzgwNiwiaWF0IjoxNzI2ODIxMzUzLCJleHAiOjE3Mjk0MTMzNTN9.4lrzHNiUam0t7vFpgCgwCPMR09C4VPwI1FXzhSdk4UM', 0, 1);
 INSERT INTO `user` VALUES (6, 'lucadev222', 'lucan1@gmail.com', 1, 'nguyen phi phu ', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/DreamShaper_v6_Woman_with_platinum_hair_in_a_dress_of_ice_flow_1.jpg', 9999, '$2b$10$7OMJSX2f252jc5ctJR000Ov9pJS2vX1nVFK.G52SKwTkbQwzUn7Hq', '2024-06-22 14:00:28', '2024-08-05 08:44:21', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NiwidXNlcm5hbWUiOiJsdWNhZGV2MjIyIiwia2V5IjoxNzIyODQ3NDYxMTA5LCJpYXQiOjE3MjI4NDc0NjEsImV4cCI6MTcyNTQzOTQ2MX0.6o_94hZJWdmjwjmuVJ78sxu-rLEJk4vvVX7WwR7k2RY', 0, 0);
@@ -417,7 +420,7 @@ INSERT INTO `user` VALUES (9, '1719656488817_devyuki1234', '1719656488817_adangt
 INSERT INTO `user` VALUES (10, 'smoleo', 'smoleo@gmail.com', 1, 'Am Leo', NULL, 0, '$2b$10$TY3mKpGPrB5bbV.EotUoI.jXPEL08lO3q321szfjXzhJXsWWV5I8u', '2024-07-10 06:39:10', '2024-07-10 06:39:10', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsInVzZXJuYW1lIjoic21vbGVvIiwia2V5IjoxNzIwNTkzNTUwNTMxLCJpYXQiOjE3MjA1OTM1NTAsImV4cCI6MTcyMzE4NTU1MH0.ixKRBEENJcJ1p2gBSi6fFd7zx4TBqmE9r0WPE-kMIT0', 0, 0);
 INSERT INTO `user` VALUES (11, 'hantieulinh123', 'tieuligcute@gmail.com', 1, 'Kieu Linh', NULL, 22, '$2b$10$l7Os5ZROcB3EuIXlDRFjI.ejSquqh3teFadHe12pLjxh/Af97.212', '2024-07-10 07:09:00', '2024-07-10 07:09:00', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsInVzZXJuYW1lIjoiaGFudGlldWxpbmgxMjMiLCJrZXkiOjE3MjA1OTUzMzk4NTEsImlhdCI6MTcyMDU5NTMzOSwiZXhwIjoxNzIzMTg3MzM5fQ.pCT20LEYXB1XZCOUtNFUR9zIbObeT73Uf1I0Qxc0-zs', 0, 0);
 INSERT INTO `user` VALUES (12, 'gialinh0212', 'truongialinh@gamil.com', 1, 'Trương Gia Linh', NULL, 55, '$2b$10$E3V4PepCARrsCvcEOQs36uaHc0qywi.LIQJPt.zHnPU8uzpEa7w92', '2024-07-10 08:08:10', '2024-08-08 05:39:50', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsInVzZXJuYW1lIjoiZ2lhbGluaDAyMTIiLCJrZXkiOjE3MjUwOTE2NzkwNzEsImlhdCI6MTcyNTA5MTY3OSwiZXhwIjoxNzI3NjgzNjc5fQ.K5IxkeNPZwAc9smIQHg8M6X2SZWjJLLvM-W1PRXtqwA', 0, 0);
-INSERT INTO `user` VALUES (13, 'AsunaYuki1009', 'navigraphteam2806@gmail.com', 2, 'dev yuki', NULL, 87, '$2b$10$Kpht5TqP6HuAUotsXxxDJO.PxC1VN1vqI1GwezTl/td3g1v/CceZm', '2024-07-15 05:51:02', '2024-08-22 09:17:37', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsInVzZXJuYW1lIjoiQXN1bmFZdWtpMTAwOSIsImtleSI6MTcyNzA5NTExNDA1MSwiaWF0IjoxNzI3MDk1MTE0LCJleHAiOjE3Mjk2ODcxMTR9.4n_vpcFPuZUPscmfgZ5uIfB12-8N424433HkEMfDRSs', 0, 1);
+INSERT INTO `user` VALUES (13, 'AsunaYuki1009', 'navigraphteam2806@gmail.com', 2, 'dev yuki', NULL, 87, '$2b$10$Kpht5TqP6HuAUotsXxxDJO.PxC1VN1vqI1GwezTl/td3g1v/CceZm', '2024-07-15 05:51:02', '2024-08-22 09:17:37', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsInVzZXJuYW1lIjoiQXN1bmFZdWtpMTAwOSIsImtleSI6MTczMjUyNDg1NjczMSwiaWF0IjoxNzMyNTI0ODU2LCJleHAiOjE3MzUxMTY4NTZ9.z-qgXWICXfUbqbnlKAk7Yq2PPEQYQRjc5oy5wXb6mXg', 0, 1);
 INSERT INTO `user` VALUES (14, 'Hoàng', 'huyhoang74205@gmail.com', 1, 'Ta Tuan Huy Hoang', NULL, 19, '$2b$10$MRNoxVs8Iihib3TTlb4jLeF6thN7nen4DwStSyzn4cDv8lpDGGO6i', '2024-07-15 15:00:44', '2024-07-15 15:00:44', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsInVzZXJuYW1lIjoiSG_DoG5nIiwia2V5IjoxNzIxMDU1NzU4MzQ4LCJpYXQiOjE3MjEwNTU3NTgsImV4cCI6MTcyMzY0Nzc1OH0.w_pdDS_PSeLSbFFpQaCq0GC0hAW_4JtLxTZORCfKY3E', 0, 0);
 INSERT INTO `user` VALUES (15, 'Hoàng', 'huyhoang74205@gmail.com', 1, 'Ta Tuan Huy Hoang', NULL, 19, '$2b$10$J9AcphnCqp4KmJz81pOof.VT1Me6HO0wqQmRXf3EKLBZJbJSC9UNm', '2024-07-15 15:00:44', '2024-07-15 15:00:44', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTUsInVzZXJuYW1lIjoiSG_DoG5nIiwia2V5IjoxNzIxMDU1NjQzNzgzLCJpYXQiOjE3MjEwNTU2NDMsImV4cCI6MTcyMzY0NzY0M30.G_hyTX9qnuGoH46JuvLrdGiKbRGLN-B_fLiJfbQIDwo', 0, 0);
 INSERT INTO `user` VALUES (16, 'ako', 'mizuto.discord@gmail.com', 1, 'doan bao', NULL, 18, '$2b$10$hH3s9PXB1zesP11ZqAInQO2gFNEN8dh9pUeW4WFjdPWDIcE3sLL/m', '2024-07-16 00:48:36', '2024-07-16 00:48:36', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsInVzZXJuYW1lIjoiYWtvIiwia2V5IjoxNzIxMTA2Njk2MTYxLCJpYXQiOjE3MjExMDY2OTYsImV4cCI6MTcyMzY5ODY5Nn0.DVNSS4OC03uf0JcrJ1jiSkAhSzu-yFNeQtEsYhgNorc', 0, 0);
@@ -439,7 +442,7 @@ INSERT INTO `user` VALUES (39, 'Micheal Dung', 'dung@gmail.com', 1, 'Micheal Dun
 INSERT INTO `user` VALUES (40, 'hantieulig', 'tieulinh123@gmail.com', 2, 'Kiều Linh', NULL, 22, '$2b$10$1Nazsuy/8gF7d0jeYpDvy.7RgLy/TBjkXqZDvXZTCBM2bHLgvU0CS', '2024-09-03 07:01:05', '2024-09-03 07:42:05', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDAsInVzZXJuYW1lIjoiaGFudGlldWxpZyIsImtleSI6MTcyNTM0OTMyNTE4NiwiaWF0IjoxNzI1MzQ5MzI1LCJleHAiOjE3Mjc5NDEzMjV9.2s345zXJ_3OTjiki4zAw_b8aA-JZx93dOTooSc_J6lU', 0, 0);
 INSERT INTO `user` VALUES (41, 'buatoimongadelam', 'telegramweb@gmail.com', 1, 'Nguyễn Văn An', NULL, 50, '$2b$10$tl4uvGUwujNdnTNC75T82.bfnxtcPmTHwZdJJfjsOMsH6AORTiDsi', '2024-09-03 14:41:06', '2024-09-03 14:41:06', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDEsInVzZXJuYW1lIjoiYnVhdG9pbW9uZ2FkZWxhbSIsImtleSI6MTcyNTM3NDQ2NTc3NSwiaWF0IjoxNzI1Mzc0NDY1LCJleHAiOjE3Mjc5NjY0NjV9.f-4mMsNZAnyBc2MFdai9g0WBLwHyYT182wJMRGarJCo', 0, 0);
 INSERT INTO `user` VALUES (65, 'icaluca12', 'icaluca12@gmail.com', 1, 'Luca 12', NULL, 22, '$2b$10$zFCQ2Dd09UsmXOTBJjZ.E.8pEK5J241/CaT5qPu1hh6AfDZBzPjFi', '2024-09-06 10:39:16', '2024-09-06 10:39:16', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjUsInVzZXJuYW1lIjoiaWNhbHVjYTEyIiwia2V5IjoxNzI2MTU1NTM3Mzc2LCJpYXQiOjE3MjYxNTU1MzcsImV4cCI6MTcyODc0NzUzN30.ddk58_T8ahv1RRjoQh4KNCB9Al0Gh8_ke23bKQKuhWs', 0, 1);
-INSERT INTO `user` VALUES (66, 'Nguyenvanb', 'icaluca14@gmail.com', 1, 'Nguyen van B', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/1728716244357_1728716245428_image', 22, '$2b$10$so81hwdFn7cOT7hmE7rZnuhVu/DTAv9RcBfIUgwxW0nbsjAsRZ7U6', '2024-09-06 17:36:22', '2024-09-06 17:36:22', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjYsInVzZXJuYW1lIjoiTmd1eWVudmFuYiIsImtleSI6MTcyODcxNTYyMTM2NiwiaWF0IjoxNzI4NzE1NjIxLCJleHAiOjE3MzEzMDc2MjF9.AcV9YYFae-8M1FeUYnkKrrol8WTAAiTYMhnXzWuPn94', 0, 1);
+INSERT INTO `user` VALUES (66, 'Nguyenvanb', 'icaluca14@gmail.com', 1, 'Nguyen van B', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/1728716244357_1728716245428_image', 22, '$2b$10$so81hwdFn7cOT7hmE7rZnuhVu/DTAv9RcBfIUgwxW0nbsjAsRZ7U6', '2024-09-06 17:36:22', '2024-10-18 15:13:18', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjYsInVzZXJuYW1lIjoiTmd1eWVudmFuYiIsImtleSI6MTcyOTI2NDg1MzI2MywiaWF0IjoxNzI5MjY0ODUzLCJleHAiOjE3MzE4NTY4NTN9.__YGFqSwxwDV9F_jMnLuHlSUQh30HZ_yAzHIiNZpcXE', 0, 1);
 INSERT INTO `user` VALUES (67, 'Quocthang', 'quocthang5731@gmail.com', 1, 'Nguyễn Leo', NULL, 22, '$2b$10$JSbTHIHopGM/vdUd0igbhe1a1T2yNarS7cY8VuG4cPi5GsPAqwgqW', '2024-09-10 16:52:01', '2024-09-10 16:52:01', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjcsInVzZXJuYW1lIjoiUXVvY3RoYW5nIiwia2V5IjoxNzI1OTg5Nzc5MTI0LCJpYXQiOjE3MjU5ODk3NzksImV4cCI6MTcyODU4MTc3OX0.j3MWdYAwD-0m7y_dZ0XXcOJ84VTwUTzJDj4DkgDhbPU', 0, 1);
 INSERT INTO `user` VALUES (68, 'd', 'duongtai110510@gmail.com', 1, 'ddat', NULL, 90, '$2b$10$5IJ.sOXrJ.Gx.OAXftB3kurYLwKW5GSPMWhffp//4qkueaK9poo6q', '2024-09-11 13:44:24', '2024-09-11 13:44:24', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjgsInVzZXJuYW1lIjoiZCIsImtleSI6MTcyNjA2MjI2NDI1MCwiaWF0IjoxNzI2MDYyMjY0LCJleHAiOjE3Mjg2NTQyNjR9.UrH2uMTHRPCrSmdkFyKuX5IhAksK7yqQHgeQXSrEgqk', 0, 0);
 INSERT INTO `user` VALUES (69, 'VuongLam', '22t1020721@husc.edu.vn', 1, 'Le Vuong Lam', NULL, 23, '$2b$10$MdzIUc140uUAhaVoPICx9OEn1saaUtNcVotiX3JunnN/Q2wy.00Yu', '2024-09-12 04:00:12', '2024-09-12 04:00:12', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjksInVzZXJuYW1lIjoiVnVvbmdMYW0iLCJrZXkiOjE3MjYxMTM2MTIwMjgsImlhdCI6MTcyNjExMzYxMiwiZXhwIjoxNzI4NzA1NjEyfQ.bUPl5c6ZCDNHwAYmuqXxyzMTHFN-RVGlJ5W0suk0m0c', 0, 0);
@@ -448,11 +451,17 @@ INSERT INTO `user` VALUES (71, 'quyen', 'quyenqh19378@gmail.com', 1, 'hoang quye
 INSERT INTO `user` VALUES (72, 'hhh', 'h@gmail.com', 1, 'nguyank ', NULL, 124, '$2b$10$mw3kUSOYdjrKh8ub9QeBAeAlAZO0SA7Vwdti.I798ZJFwRphVTlya', '2024-09-14 06:57:45', '2024-09-14 06:57:45', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzIsInVzZXJuYW1lIjoiaGhoIiwia2V5IjoxNzI2Mjk3MDY0NzQ4LCJpYXQiOjE3MjYyOTcwNjQsImV4cCI6MTcyODg4OTA2NH0.SAVMZVlzFfoaxhW6nCaMSdS-D0qlV3VOV9AVDzLemAs', 0, 0);
 INSERT INTO `user` VALUES (73, 'dddd', 'dddd@gmial.com', 1, 'đâsdasdasdas', NULL, 12, '$2b$10$rLHay8BCEYNZ444QpBqlEuUs4zUmAdhuhWm2av7PUfWmRvqhY3Bea', '2024-09-17 17:17:11', '2024-09-17 17:17:11', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzMsInVzZXJuYW1lIjoiZGRkZCIsImtleSI6MTcyNjU5MzQzMTQyMywiaWF0IjoxNzI2NTkzNDMyLCJleHAiOjE3MjkxODU0MzJ9.dx9oS2fjHEUhpEBekC1gCpyPOHjbQ28OOX2FN4b7HYk', 0, 0);
 INSERT INTO `user` VALUES (74, 'Anh Le', 'anh1234@gmail.com', 1, 'adds', NULL, 12, '$2b$10$.7z8gSItyRqOuwtsj/bs7OT7mKijss.aGgiFcCRzM3zo6Huw24Agi', '2024-09-18 15:18:20', '2024-09-18 15:18:20', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzQsInVzZXJuYW1lIjoiQW5oIExlIiwia2V5IjoxNzI2NjcyNzAwMDM3LCJpYXQiOjE3MjY2NzI3MDAsImV4cCI6MTcyOTI2NDcwMH0.Z8gOJe4i1oV2oPznBMvGSromQ0Nfvh-gwZ4Af0kBeWo', 0, 0);
-INSERT INTO `user` VALUES (75, 'icaluca14plus', 'icaluca14+test1@gmail.com', 1, 'icaluca14plus', NULL, 22, '$2b$10$so81hwdFn7cOT7hmE7rZnuhVu/DTAv9RcBfIUgwxW0nbsjAsRZ7U6', '2024-09-19 07:44:54', '2024-09-19 07:44:54', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzUsInVzZXJuYW1lIjoiaWNhbHVjYTE0cGx1cyIsImtleSI6MTcyODM3NzY1NTc2NSwiaWF0IjoxNzI4Mzc3NjU1LCJleHAiOjE3MzA5Njk2NTV9.tA95IbMZLCnp0e_hWBErQN23hE8REEZ_1GWuVwAstMM', 0, 1);
+INSERT INTO `user` VALUES (75, 'icaluca14plus', 'icaluca14+test1@gmail.com', 1, 'Luca 14', 'https://bmboosjxeycdzkofgsmx.supabase.co/storage/v1/object/public/Pinterrest_upload/1728979956129_1728979954167_image', 22, '$2b$10$YqOkSZIjXW.8tgRAjj569.3.bS9PdSrTM1hUXqiVVz9iL9QQf5JO6', '2024-09-19 07:44:54', '2024-10-15 10:35:42', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzUsInVzZXJuYW1lIjoiaWNhbHVjYTE0cGx1cyIsImtleSI6MTczMjA5MTc1ODAzOSwiaWF0IjoxNzMyMDkxNzU4LCJleHAiOjE3MzQ2ODM3NTh9.X_-VzBKErvk_pkHTIQ_mdjSLFLvCoigCGVtDzb5GLvo', 0, 1);
 INSERT INTO `user` VALUES (76, '1726822382449_YukiAsuna2007', '1726822382449_asunayuki402@gmail.com', 1, 'Asuna Yuki', NULL, 17, '$2b$10$aaBom8TVNjtEgHbs6QMbsuVzsQNSd2YPRm5z80/k.v6Eg6jb/CZpO', '2024-09-20 08:41:38', '2024-09-20 08:41:38', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzYsInVzZXJuYW1lIjoiWXVraUFzdW5hMjAwNyIsImtleSI6MTcyNjgyMTczNzEzNywiaWF0IjoxNzI2ODIxNzM3LCJleHAiOjE3Mjk0MTM3Mzd9.xO7vl-nzz1RjwwQwichGHsxyA0z4BxzlBgHHMWIb6aQ', 1, 1);
 INSERT INTO `user` VALUES (77, '1726823089841_YukiAsuna2007', '1726823089841_asunayuki402@gmail.com', 1, 'Asuna Yuki', NULL, 17, '$2b$10$deWoSFarzpi5qOJg8RlipOtSW0xD9qNfHqZj6TgtubqtIV7eNRvKK', '2024-09-20 08:53:42', '2024-09-20 08:53:42', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzcsInVzZXJuYW1lIjoiWXVraUFzdW5hMjAwNyIsImtleSI6MTcyNjgyMjQyMjM2OSwiaWF0IjoxNzI2ODIyNDIyLCJleHAiOjE3Mjk0MTQ0MjJ9.XRTOGATbCSZxC6YsOhQm4ukMDnYXwPf2PP-9OOW-iAw', 1, 0);
 INSERT INTO `user` VALUES (78, '1726823791308_YukiAsuna2007', '1726823791308_asunayuki402@gmail.com', 1, 'yuki asunay', NULL, 17, '$2b$10$xiR5CLYDyB.US3SxTqGKk.1VY6FLomRAKAMDKaOos53Wztd7Er2nK', '2024-09-20 09:05:39', '2024-09-20 09:05:39', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzgsInVzZXJuYW1lIjoiWXVraUFzdW5hMjAwNyIsImtleSI6MTcyNjgyMzE2NjUxNCwiaWF0IjoxNzI2ODIzMTY2LCJleHAiOjE3Mjk0MTUxNjZ9.hR-EtghfUj07RQQJPJeUMn-xV2qitjk8iJciPdtAQ24', 1, 1);
 INSERT INTO `user` VALUES (79, 'LENGUYENNAMPHUONG', 'phuonglenguyen2811@gmail.com', 1, 'Phuong', NULL, 23, '$2b$10$2bK3Ge1qzUesd0KnKMHq3uQ6Z/SgXYeNbE156r25ng3BFADx7bKB6', '2024-09-26 14:16:01', '2024-09-26 14:16:01', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NzksInVzZXJuYW1lIjoiTEVOR1VZRU5OQU1QSFVPTkciLCJrZXkiOjE3MjczNjAxNjE0NTAsImlhdCI6MTcyNzM2MDE2MSwiZXhwIjoxNzI5OTUyMTYxfQ.npbM3IeTFAUCJ-GhfSmFFz7So_DVTBAMRM0VIAa-RyQ', 0, 0);
+INSERT INTO `user` VALUES (80, 'fpt1', 'fpt1@gmail.com', 1, 'fpt1', NULL, 22, '$2b$10$fX6yKcDhl3vCuSRY7q4RoeYeoVLGVsKo3HndMagj5Y.trLoG4USUW', '2024-11-20 06:49:14', '2024-11-20 06:49:14', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ODAsInVzZXJuYW1lIjoiZnB0MSIsImtleSI6MTczMjA4NTM1NDE5MCwiaWF0IjoxNzMyMDg1MzU0LCJleHAiOjE3MzQ2NzczNTR9.n9gj58hFqAhM41f-8NyL8QvysJWyM61pl14HXRjG2uw', 0, 0);
+INSERT INTO `user` VALUES (81, 'fpt2', 'fpt2@gmail.com', 1, 'fpt2', NULL, 22, '$2b$10$Lu/QiqD1IM2ShZ3QqwX3UudX5gngAjhLyJZbt3O.BCEtoJp0jcqSm', '2024-11-20 06:59:16', '2024-11-20 06:59:16', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ODEsInVzZXJuYW1lIjoiZnB0MiIsImtleSI6MTczMjA4NTk1ODA5NSwiaWF0IjoxNzMyMDg1OTU4LCJleHAiOjE3MzQ2Nzc5NTh9.VFhlHkdC6CIxh6D_VX9wEwo8OTcKTxvHRG0jbeAtay8', 0, 0);
+INSERT INTO `user` VALUES (82, 'furina1', 'furina1@gmail.com', 1, 'furina 3 year', NULL, 11, '$2b$10$qkpKj4MEw5CV4aTHBNr0eu.mo02T5ySwrSOerT/cu.YSA1nsby4oW', '2024-11-20 07:27:20', '2024-11-20 07:27:20', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ODIsInVzZXJuYW1lIjoiZnVyaW5hMSIsImtleSI6MTczMjA4NzY0MTcyOSwiaWF0IjoxNzMyMDg3NjQxLCJleHAiOjE3MzQ2Nzk2NDF9.whOfAnOQDLP1YrayYttNrVXhnuPung4LceRnaGA1lkE', 0, 0);
+INSERT INTO `user` VALUES (83, 'fpt3', 'fpt3@gmail.com', 1, 'fpt3', NULL, 22, '$2b$10$P6N/4MnzMbscQjVHT6ouZuOJHF83W2vd8.8lhKFVP8oAIxmG6/i8u', '2024-11-20 08:17:10', '2024-11-20 08:17:10', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ODMsInVzZXJuYW1lIjoiZnB0MyIsImtleSI6MTczMjA5MDYzMTg5MCwiaWF0IjoxNzMyMDkwNjMxLCJleHAiOjE3MzQ2ODI2MzF9.bvaZLDfPoa7q0ftM5f8PT2IeytAzbSjydET3KuXXnug', 0, 0);
+INSERT INTO `user` VALUES (92, 'testactive1', 'icaluca14+testactive1@gmail.com', 1, 'testactive1', NULL, 0, '$2b$10$atFNn82/EZluvqoaJTO47eCj3fRYDbUnNKA6I5VNWpjKoRdkGV/ny', '2024-11-21 09:14:19', '2024-11-21 09:14:19', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTIsInVzZXJuYW1lIjoidGVzdGFjdGl2ZTEiLCJrZXkiOjE3MzIxODIwNzQxMDgsImlhdCI6MTczMjE4MjA3NCwiZXhwIjoxNzM0Nzc0MDc0fQ.Fn3WWEE_KkixA7q9AqYKBkgglRs6ifkpraW1VIilNFo', 0, 1);
+INSERT INTO `user` VALUES (94, 'testactive2', 'icaluca14+testactive2@gmail.com', 1, 'testactive2', NULL, 22, '$2b$10$1ZjO2lpum/OwA0mWH6GhSOslWD11S89dsjRFBHCqZ8Xxcf8eUChUO', '2024-11-24 19:28:35', '2024-11-24 19:28:35', 0, 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6OTQsInVzZXJuYW1lIjoidGVzdGFjdGl2ZTIiLCJrZXkiOjE3MzI0Nzc0NjQ5NzIsImlhdCI6MTczMjQ3NzQ2NCwiZXhwIjoxNzM1MDY5NDY0fQ.GW0itlulEgPKTvKSzsYh9crxnUKBB5-HO_i8ElZNb2E', 0, 1);
 
 -- ----------------------------
 -- Table structure for user_type

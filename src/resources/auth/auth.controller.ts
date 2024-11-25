@@ -1,7 +1,6 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { IResponseType } from 'src/interfaces/interfaces.global';
 import { UserLoginDto } from './dto/UserLogin.dto';
 import { UserRegisterDto } from './dto/UserRegister.dto';
@@ -11,7 +10,6 @@ import { ActivationByCodeDto } from './dto/ActivationByCode.dto';
 @Controller('auth')
 @ApiTags('User Managements')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

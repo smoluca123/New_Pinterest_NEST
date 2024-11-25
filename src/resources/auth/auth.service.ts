@@ -20,6 +20,7 @@ import { EmailService } from '../email/email.service';
 import { SendActivationMailDto } from './dto/SendMail.dto';
 import { isPast } from 'date-fns';
 import { ActivationByCodeDto } from './dto/ActivationByCode.dto';
+import { userDataSelect } from 'src/interfaces/prisma-types';
 
 @Injectable()
 export class AuthService {
@@ -35,34 +36,13 @@ export class AuthService {
         where: {
           OR: [{ username }, { email: username }],
         },
-        include: {
-          user_type: true,
-        },
+        select: { ...userDataSelect, password: true },
       });
       if (!checkUsername) {
         throw new NotFoundException('User not found!');
       }
 
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      const {
-        password: _pw,
-        is_ban,
-        refresh_token,
-        type,
-        ...userResult
-      } = checkUsername;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
-
       if (checkUsername.is_ban) throw new ForbiddenException('User is banned!');
-      // if (!checkUsername.is_active)
-      //   throw new ForbiddenException({
-      //     message: 'Account has not been activated',
-      //     data: {
-      //       ...userResult,
-      //     },
-      //     error: 'ACCOUNT_NOT_ACTIVATED',
-      //     statusCode: 403,
-      //   });
 
       const checkPassword = bcrypt.compareSync(
         password,
@@ -97,6 +77,9 @@ export class AuthService {
           refresh_token: refreshToken,
         },
       });
+
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _pw, ...userResult } = checkUsername;
 
       return {
         statusCode: 200,
@@ -146,19 +129,11 @@ export class AuthService {
           updated_at: time,
           is_active: ACTIVE_STATUS.IS_INACTIVE,
         },
-        include: {
-          user_type: true,
-        },
+        select: userDataSelect,
       });
 
       /* eslint-disable @typescript-eslint/no-unused-vars*/
-      const {
-        password: _pw,
-        is_ban,
-        refresh_token,
-        type,
-        ...userResult
-      } = createdUser;
+
       /* eslint-enable @typescript-eslint/no-unused-vars*/
 
       // const accessToken = await this.jwt.signAsync({
@@ -192,7 +167,7 @@ export class AuthService {
       return {
         message:
           'Sign up successfully! Check email and activate your account please!',
-        data: { ...userResult },
+        data: { ...createdUser },
         statusCode: 201,
         date: new Date(),
       };
@@ -292,14 +267,6 @@ export class AuthService {
         where: {
           id: userId,
         },
-        include: {
-          user_type: {
-            select: {
-              id: true,
-              type_name: true,
-            },
-          },
-        },
       });
       const checkCode = await this.prisma.active_code.findFirst({
         where: {
@@ -325,30 +292,30 @@ export class AuthService {
           'Verification code is expired, resend to try again',
         );
 
-      const key = new Date().getTime();
-      const accessToken = await this.jwt.signAsync({
-        id: checkUser.id,
-        username: checkUser.username,
-        key,
-      });
-      const refreshToken = await this.jwt.signAsync(
-        {
-          id: checkUser.id,
-          username: checkUser.username,
-          key,
-        },
-        {
-          expiresIn: '30d',
-        },
-      );
+      // const key = new Date().getTime();
+      // const accessToken = await this.jwt.signAsync({
+      //   id: checkUser.id,
+      //   username: checkUser.username,
+      //   key,
+      // });
+      // const refreshToken = await this.jwt.signAsync(
+      //   {
+      //     id: checkUser.id,
+      //     username: checkUser.username,
+      //     key,
+      //   },
+      //   {
+      //     expiresIn: '30d',
+      //   },
+      // );
       const updatedUser = await this.prisma.user.update({
         data: {
           is_active: 1,
-          refresh_token: refreshToken,
         },
         where: {
           id: checkUser.id,
         },
+        select: userDataSelect,
       });
       await this.prisma.active_code.delete({
         where: {
@@ -356,20 +323,10 @@ export class AuthService {
         },
       });
 
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      const {
-        password: _pw,
-        refresh_token,
-        type,
-        is_ban,
-        ...userResult
-      } = updatedUser;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
-
       return {
         statusCode: 200,
         message: 'Account activated successfully',
-        data: { ...userResult, accessToken },
+        data: { ...updatedUser },
         date: new Date(),
       };
     } catch (error) {
