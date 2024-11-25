@@ -19,6 +19,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { DEFAULT_LIMIT } from 'src/global/constant.global';
 import { SupabaseService } from 'src/supabase/supabase.service';
+import { userDataSelect } from 'src/interfaces/prisma-types';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -38,7 +40,7 @@ export class UserService {
       limit = limit ? +limit : DEFAULT_LIMIT;
       page = page ? +page : 1;
 
-      const whereQuery = {
+      const whereQuery: Prisma.userWhereInput = {
         AND: [
           {
             OR: [
@@ -53,19 +55,7 @@ export class UserService {
       };
       const listUsers = await this.prisma.user.findMany({
         where: whereQuery,
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          full_name: true,
-          age: true,
-          user_type: true,
-          is_ban: true,
-          is_active: true,
-          avatar: true,
-          created_at: true,
-          updated_at: true,
-        },
+        select: userDataSelect,
         take: limit,
         skip: (page - 1) * limit,
       });
@@ -98,15 +88,13 @@ export class UserService {
           id: +id,
           username,
         },
+        select: userDataSelect,
       });
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { type, is_ban, password, refresh_token, ...userResult } = userInfo;
 
       return {
         message: 'Get my infomation successfully!',
         statusCode: 200,
-        data: { ...userResult },
+        data: { ...userInfo },
         date: new Date(),
       };
     } catch (error) {
@@ -122,21 +110,16 @@ export class UserService {
         where: {
           id: userId,
         },
-        include: {
-          user_type: true,
-        },
+        select: userDataSelect,
       });
 
       if (!userInfo) throw new NotFoundException('User not found!');
-
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { type, is_ban, password, refresh_token, ...userResult } = userInfo;
 
       return {
         message: 'Get user infomation successfully!',
         statusCode: 200,
         data: {
-          ...userResult,
+          ...userInfo,
         },
         date: new Date(),
       };
@@ -182,27 +165,21 @@ export class UserService {
         { expiresIn: '30d' },
       );
 
-      const {
-        /* eslint-disable @typescript-eslint/no-unused-vars*/
-        type,
-        password: _pw,
-        refresh_token,
-        is_ban,
-        ...userResult
-      } = await this.prisma.user.update({
+      const updatedUser = await this.prisma.user.update({
         where: {
           id: checkUser.id,
         },
         data: {
           refresh_token: newRefreshToken,
         },
+        select: userDataSelect,
       });
       /* eslint-enable @typescript-eslint/no-unused-vars*/
 
       return {
         message: 'Refresh token successfully!',
         statusCode: 200,
-        data: { ...userResult, accessToken: newAccessToken },
+        data: { ...updatedUser, accessToken: newAccessToken },
         date: new Date(),
       };
     } catch (error) {
@@ -223,9 +200,7 @@ export class UserService {
         where: {
           id: userId,
         },
-        include: {
-          user_type: true,
-        },
+        select: userDataSelect,
       });
       if (!user) throw new NotFoundException('User not found!');
 
@@ -239,13 +214,11 @@ export class UserService {
           },
         });
       }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, refresh_token, type, ...userResult } = user;
       return {
         message: 'Ban user successfully!',
         statusCode: 200,
         data: {
-          ...userResult,
+          ...user,
           is_ban: data.is_ban,
         },
         date: new Date(),
@@ -300,21 +273,13 @@ export class UserService {
         where: {
           id: checkUser.id,
         },
+        select: userDataSelect,
       });
-      /* eslint-disable @typescript-eslint/no-unused-vars*/
-      const {
-        is_ban,
-        type,
-        refresh_token,
-        password: _pw,
-        ...userResult
-      } = updatedUser;
-      /* eslint-enable @typescript-eslint/no-unused-vars*/
 
       return {
         message: 'Update info successfully!',
         statusCode: 200,
-        data: { ...userResult, accessToken },
+        data: { ...updatedUser, accessToken },
         date: new Date(),
       };
     } catch (error) {
@@ -384,25 +349,14 @@ export class UserService {
         refresh_token: refreshToken,
         updated_at: new Date(),
       },
-      include: {
-        user_type: true,
-      },
+      select: userDataSelect,
     });
-
-    /* eslint-disable @typescript-eslint/no-unused-vars*/
-    const {
-      password: _pw,
-      refresh_token,
-      type: _type,
-      ...userResult
-    } = updatedUser;
-    /* eslint-enable @typescript-eslint/no-unused-vars*/
 
     try {
       return {
         message: 'Update user successfully!',
         statusCode: 200,
-        data: { ...userResult, accessToken },
+        data: { ...updatedUser, accessToken },
         date: new Date(),
       };
     } catch (error) {
@@ -439,25 +393,13 @@ export class UserService {
         data: {
           avatar: url,
         },
-        include: {
-          user_type: true,
-        },
+        select: userDataSelect,
       });
-
-      const {
-        /* eslint-disable @typescript-eslint/no-unused-vars*/
-        password: _pw,
-        refresh_token,
-        type,
-        is_ban,
-        ...resultUser
-      } = updatedUser;
-      /* eslint-enable @typescript-eslint/no-unused-vars*/
 
       return {
         message: 'Update user avatar successfully!',
         statusCode: 200,
-        data: resultUser,
+        data: updatedUser,
         date: new Date(),
       };
     } catch (error) {

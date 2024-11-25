@@ -26,7 +26,6 @@ import {
   IRequestWithDecodedAccessToken,
   IResponseType,
 } from 'src/interfaces/interfaces.global';
-import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/guards/roles.guard';
 import {
   decoratorsBanUser,
@@ -43,7 +42,7 @@ import { FileIsImageValidationPipe } from 'src/pipes/ImageTypeValidator.pipe';
 
 @ApiTags('User Managements')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(RolesGuard)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

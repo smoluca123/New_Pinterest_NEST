@@ -20,6 +20,13 @@ import { CreateCommentDto } from './dto/CreateComment.dto';
 import { DEFAULT_LIMIT } from 'src/global/constant.global';
 import { MediaUpdateAdminDto, MediaUpdateDto } from './dto/MediaUpdate.dto';
 import { CommentsGateway } from './gateways/comments.gateway';
+import {
+  imageDataSelect,
+  mediaDataSelect,
+  saveMediaDataSelect,
+  userDataSelect,
+} from 'src/interfaces/prisma-types';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class MediaService {
@@ -38,7 +45,7 @@ export class MediaService {
       limit = limit ? +limit : DEFAULT_LIMIT;
       page = page ? +page : 1;
 
-      const whereQuery = {
+      const whereQuery: Prisma.mediaWhereInput = {
         AND: [
           {
             OR: [
@@ -59,36 +66,7 @@ export class MediaService {
       const mediaList = await this.prisma.media.findMany({
         where: whereQuery,
 
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          created_at: true,
-          updated_at: true,
-          type: true,
-          user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
-          },
-          image: {
-            select: {
-              id: true,
-              img_name: true,
-              url: true,
-              created_at: true,
-            },
-          },
-        },
+        select: mediaDataSelect,
 
         take: limit,
         skip: (page - 1) * limit,
@@ -121,7 +99,7 @@ export class MediaService {
       limit = limit ? +limit : DEFAULT_LIMIT;
       page = page ? +page : 1;
 
-      const whereQuery = {
+      const whereQuery: Prisma.mediaWhereInput = {
         AND: [
           {
             OR: [
@@ -143,36 +121,7 @@ export class MediaService {
       const mediaList = await this.prisma.media.findMany({
         where: whereQuery,
 
-        select: {
-          id: true,
-          name: true,
-          slug: true,
-          description: true,
-          created_at: true,
-          updated_at: true,
-          type: true,
-          user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
-          },
-          image: {
-            select: {
-              id: true,
-              img_name: true,
-              url: true,
-              created_at: true,
-            },
-          },
-        },
+        select: mediaDataSelect,
 
         take: limit,
         skip: (page - 1) * limit,
@@ -202,62 +151,38 @@ export class MediaService {
           id: mediaId,
           is_hidden: 0,
         },
-        include: {
-          image: {
-            select: {
-              id: true,
-              img_name: true,
-              url: true,
-              created_at: true,
-            },
-          },
-          user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
-          },
+        // include: {
+        //   image: {
+        //     select: {
+        //       id: true,
+        //       img_name: true,
+        //       url: true,
+        //       created_at: true,
+        //     },
+        //   },
+        //   user: {
+        //     select: {
+        //       id: true,
+        //       username: true,
+        //       full_name: true,
+        //       age: true,
+        //       avatar: true,
+        //       user_type: true,
+        //       created_at: true,
+        //       updated_at: true,
+        //       is_ban: true,
+        //     },
+        //   },
+        // },
 
-          // comment: {
-          //   select: {
-          //     id: true,
-          //     content: true,
-          //     created_at: true,
-          //     updated_at: true,
-          //     user: {
-          //       select: {
-          //         id: true,
-          //         username: true,
-          //         full_name: true,
-          //         age: true,
-          //         avatar: true,
-          //         user_type: true,
-          //         created_at: true,
-          //         updated_at: true,
-          //         is_ban: true,
-          //       },
-          //     },
-          //   },
-          // },
-        },
+        select: mediaDataSelect,
       });
 
       if (!media) throw new NotFoundException('Media not found');
 
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      const { creator_id, is_hidden, ...restMediaResult } = media;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
-
       return {
         message: 'Get Media Detail Success',
-        data: { ...restMediaResult },
+        data: { ...media },
         statusCode: 200,
         date: new Date(),
       };
@@ -278,7 +203,7 @@ export class MediaService {
       limit = limit ? +limit : DEFAULT_LIMIT;
       page = page ? +page : 1;
 
-      const whereQuery = {
+      const whereQuery: Prisma.commentWhereInput = {
         media_id: mediaId,
         AND: [
           {
@@ -295,17 +220,7 @@ export class MediaService {
         where: whereQuery,
         include: {
           user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
+            select: userDataSelect,
           },
         },
         take: limit,
@@ -347,7 +262,7 @@ export class MediaService {
 
       const { id } = decodedAccessToken;
 
-      const whereQuery = {
+      const whereQuery: Prisma.save_mediaWhereInput = {
         user_id: +id,
         AND: [
           {
@@ -369,42 +284,7 @@ export class MediaService {
 
       const savedMedias = await this.prisma.save_media.findMany({
         where: whereQuery,
-        select: {
-          id: true,
-          created_at: true,
-          media: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              description: true,
-              created_at: true,
-              updated_at: true,
-              type: true,
-              user: {
-                select: {
-                  id: true,
-                  username: true,
-                  full_name: true,
-                  age: true,
-                  avatar: true,
-                  user_type: true,
-                  created_at: true,
-                  updated_at: true,
-                  is_ban: true,
-                },
-              },
-              image: {
-                select: {
-                  id: true,
-                  img_name: true,
-                  url: true,
-                  created_at: true,
-                },
-              },
-            },
-          },
-        },
+        select: saveMediaDataSelect,
         take: limit,
         skip: (page - 1) * limit,
       });
@@ -435,7 +315,7 @@ export class MediaService {
       limit = limit ? +limit : DEFAULT_LIMIT;
       page = page ? +page : 1;
 
-      const whereQuery = {
+      const whereQuery: Prisma.save_mediaWhereInput = {
         user_id: userId,
         AND: [
           {
@@ -457,42 +337,7 @@ export class MediaService {
 
       const savedMedias = await this.prisma.save_media.findMany({
         where: whereQuery,
-        select: {
-          id: true,
-          created_at: true,
-          media: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              description: true,
-              created_at: true,
-              updated_at: true,
-              type: true,
-              user: {
-                select: {
-                  id: true,
-                  username: true,
-                  full_name: true,
-                  age: true,
-                  avatar: true,
-                  user_type: true,
-                  created_at: true,
-                  updated_at: true,
-                  is_ban: true,
-                },
-              },
-              image: {
-                select: {
-                  id: true,
-                  img_name: true,
-                  url: true,
-                  created_at: true,
-                },
-              },
-            },
-          },
-        },
+        select: saveMediaDataSelect,
         take: limit,
         skip: (page - 1) * limit,
       });
@@ -574,17 +419,7 @@ export class MediaService {
         data: commentCreateData,
         include: {
           user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
+            select: userDataSelect,
           },
         },
       });
@@ -653,38 +488,12 @@ export class MediaService {
         where: {
           id: createdMedia.id,
         },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
-          },
-          image: {
-            select: {
-              id: true,
-              img_name: true,
-              url: true,
-              created_at: true,
-            },
-          },
-        },
+        select: mediaDataSelect,
       });
-
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      const { creator_id, is_hidden, ...restMediaResult } = mediaResult;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
 
       return {
         message: 'Success',
-        data: { ...restMediaResult },
+        data: { ...mediaResult },
         // data: {},
         statusCode: 201,
         date: new Date(),
@@ -739,38 +548,12 @@ export class MediaService {
         where: {
           id: createdMedia.id,
         },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
-          },
-          image: {
-            select: {
-              id: true,
-              img_name: true,
-              url: true,
-              created_at: true,
-            },
-          },
-        },
+        select: mediaDataSelect,
       });
-
-      /* eslint-disable @typescript-eslint/no-unused-vars */
-      const { creator_id, is_hidden, ...restMediaResult } = mediaResult;
-      /* eslint-enable @typescript-eslint/no-unused-vars */
 
       return {
         message: 'Media Upload Success',
-        data: { ...restMediaResult },
+        data: { ...mediaResult },
         // data: {},
         statusCode: 201,
         date: new Date(),
@@ -793,6 +576,7 @@ export class MediaService {
       const media = await this.prisma.media.findUnique({
         where: {
           id: mediaId,
+          is_hidden: 0,
         },
       });
 
@@ -826,34 +610,7 @@ export class MediaService {
           user_id: +id,
           created_at: new Date(),
         },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
-          },
-          media: {
-            select: {
-              id: true,
-              name: true,
-              slug: true,
-              description: true,
-              type: true,
-              creator_id: true,
-              created_at: true,
-              updated_at: true,
-              is_hidden: true,
-            },
-          },
-        },
+        select: saveMediaDataSelect,
       });
 
       return {
@@ -900,29 +657,7 @@ export class MediaService {
           description: description || undefined,
           updated_at: new Date(),
         },
-        include: {
-          user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
-          },
-          image: {
-            select: {
-              id: true,
-              img_name: true,
-              url: true,
-              created_at: true,
-            },
-          },
-        },
+        select: mediaDataSelect,
       });
       return {
         message: 'Media Update Success',
@@ -964,25 +699,10 @@ export class MediaService {
         },
         include: {
           user: {
-            select: {
-              id: true,
-              username: true,
-              full_name: true,
-              age: true,
-              avatar: true,
-              user_type: true,
-              created_at: true,
-              updated_at: true,
-              is_ban: true,
-            },
+            select: userDataSelect,
           },
           image: {
-            select: {
-              id: true,
-              img_name: true,
-              url: true,
-              created_at: true,
-            },
+            select: imageDataSelect,
           },
         },
       });

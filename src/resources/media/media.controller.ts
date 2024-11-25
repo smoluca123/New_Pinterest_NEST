@@ -19,7 +19,6 @@ import {
   IRequestWithDecodedAccessToken,
   IResponseType,
 } from 'src/interfaces/interfaces.global';
-import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/guards/roles.guard';
 import {
   ApiBearerAuth,
@@ -50,7 +49,7 @@ import { MediaUpdateAdminDto, MediaUpdateDto } from './dto/MediaUpdate.dto';
 @Controller('media')
 @ApiBearerAuth()
 @ApiTags('Media Managements')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(RolesGuard)
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
