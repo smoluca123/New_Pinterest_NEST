@@ -27,6 +27,10 @@ import {
   userDataSelect,
 } from 'src/interfaces/prisma-types';
 import { Prisma } from '@prisma/client';
+import {
+  UpdateCommentAdminDto,
+  UpdateCommentDto,
+} from 'src/resources/media/dto/UpdateComment.dto';
 
 @Injectable()
 export class MediaService {
@@ -709,6 +713,98 @@ export class MediaService {
       return {
         message: 'Media Update Success',
         data: updatedMedia,
+        statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async updateComment({
+    userId,
+    commentId,
+    commentData,
+  }: {
+    userId: number;
+    commentId: number;
+    commentData: UpdateCommentDto;
+  }): Promise<IResponseType> {
+    try {
+      const { content } = commentData;
+
+      const checkComment = await this.prisma.comment.findUnique({
+        where: {
+          id: commentId,
+        },
+      });
+
+      if (!checkComment) throw new NotFoundException('Comment not found');
+      if (checkComment.user_id !== userId) {
+        throw new ForbiddenException('You cannot update this comment');
+      }
+
+      const updatedComment = await this.prisma.comment.update({
+        where: {
+          id: commentId,
+        },
+        data: {
+          content: content || undefined,
+          updated_at: new Date(),
+        },
+        include: {
+          user: {
+            select: userDataSelect,
+          },
+        },
+      });
+      return {
+        message: 'Comment Update Success',
+        data: updatedComment,
+        statusCode: 200,
+        date: new Date(),
+      };
+    } catch (error) {
+      handleDefaultError(error);
+    }
+  }
+
+  async updateCommentAdmin({
+    commentId,
+    commentData,
+  }: {
+    commentId: number;
+    commentData: UpdateCommentAdminDto;
+  }): Promise<IResponseType> {
+    try {
+      const { content, replyTo } = commentData;
+
+      const checkComment = await this.prisma.comment.findUnique({
+        where: {
+          id: commentId,
+        },
+      });
+
+      if (!checkComment) throw new NotFoundException('Comment not found');
+
+      const updatedComment = await this.prisma.comment.update({
+        where: {
+          id: commentId,
+        },
+        data: {
+          content: content || undefined,
+          reply_to: replyTo || undefined,
+          updated_at: new Date(),
+        },
+        include: {
+          user: {
+            select: userDataSelect,
+          },
+        },
+      });
+      return {
+        message: 'Comment Update Success',
+        data: updatedComment,
         statusCode: 200,
         date: new Date(),
       };

@@ -41,10 +41,16 @@ import {
   decoratorsRemoveComment,
   decoratorsRemoveMedia,
   decoratorsSaveMedia,
+  decoratorsUpdateComment,
+  decoratorsUpdateCommentAdmin,
   decoratorsUpdateMedia,
   decoratorsUpdateMediaAdmin,
 } from './media.decorators';
 import { MediaUpdateAdminDto, MediaUpdateDto } from './dto/MediaUpdate.dto';
+import {
+  UpdateCommentAdminDto,
+  UpdateCommentDto,
+} from 'src/resources/media/dto/UpdateComment.dto';
 
 @Controller('media')
 @ApiBearerAuth()
@@ -207,6 +213,33 @@ export class MediaController {
     @Body() mediaData: MediaUpdateAdminDto,
   ): Promise<IResponseType> {
     return this.mediaService.updateMediaAdmin(+mediaId, mediaData);
+  }
+
+  @Put('update-comment/:id')
+  @decoratorsUpdateComment()
+  updateComment(
+    @Req() request: IRequestWithDecodedAccessToken,
+    @Param('id') commentId: number | string,
+    @Body() commentData: UpdateCommentDto,
+  ) {
+    const { decodedAccessToken } = request;
+    return this.mediaService.updateComment({
+      userId: +decodedAccessToken.id,
+      commentId: +commentId,
+      commentData,
+    });
+  }
+
+  @Put('update-comment-admin/:id')
+  @decoratorsUpdateCommentAdmin()
+  updateCommentAdmin(
+    @Param('id') commentId: number | string,
+    @Body() commentData: UpdateCommentAdminDto,
+  ) {
+    return this.mediaService.updateCommentAdmin({
+      commentId: +commentId,
+      commentData,
+    });
   }
 
   @Delete('remove-comment/:id')
