@@ -165,6 +165,31 @@ export const decoratorsSaveMedia = () =>
     ApiParam({ name: 'id', required: true, description: 'Media Id' }),
   );
 
+export const decoratorsUpdateComment = () =>
+  applyDecorators(
+    UseGuards(JwtTokenVerifyGuard),
+    ApiOperation({
+      summary: 'Update Comment API',
+      description: 'Update comment of media',
+    }),
+    ApiHeader({
+      name: 'accessToken',
+      description: 'Access Token',
+      required: true,
+    }),
+    ApiParam({ name: 'id', required: true, description: 'Comment Id' }),
+  );
+
+export const decoratorsUpdateCommentAdmin = () =>
+  applyDecorators(
+    Roles([RolesLevel.ADMIN]),
+    ApiOperation({
+      summary: 'Update Comment API (Admin Only)',
+      description: 'Update comment of media',
+    }),
+    ApiParam({ name: 'id', required: true, description: 'Comment Id' }),
+  );
+
 export const decoratorsRemoveComment = () =>
   applyDecorators(
     UseGuards(JwtTokenVerifyGuard),
