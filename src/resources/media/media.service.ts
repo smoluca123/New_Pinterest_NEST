@@ -213,7 +213,7 @@ export class MediaService {
           {
             OR: [
               {
-                reply_to: replyTo || undefined,
+                reply_to: replyTo || null,
               },
             ],
           },
