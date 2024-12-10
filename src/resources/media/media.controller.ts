@@ -6,8 +6,8 @@ import {
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
   Request,
@@ -192,7 +192,7 @@ export class MediaController {
     return this.mediaService.saveMedia(decodedAccessToken, +mediaId);
   }
 
-  @Put('update-media/:id')
+  @Patch('update-media/:id')
   @decoratorsUpdateMedia()
   updateMedia(
     @Req() request: IRequestWithDecodedAccessToken,
@@ -206,7 +206,7 @@ export class MediaController {
       mediaData,
     );
   }
-  @Put('update-media-admin/:id')
+  @Patch('update-media-admin/:id')
   @decoratorsUpdateMediaAdmin()
   updateMediaAdmin(
     @Param('id') mediaId: number | string,
@@ -215,7 +215,7 @@ export class MediaController {
     return this.mediaService.updateMediaAdmin(+mediaId, mediaData);
   }
 
-  @Put('update-comment/:id')
+  @Patch('update-comment/:id')
   @decoratorsUpdateComment()
   updateComment(
     @Req() request: IRequestWithDecodedAccessToken,
@@ -230,7 +230,7 @@ export class MediaController {
     });
   }
 
-  @Put('update-comment-admin/:id')
+  @Patch('update-comment-admin/:id')
   @decoratorsUpdateCommentAdmin()
   updateCommentAdmin(
     @Param('id') commentId: number | string,

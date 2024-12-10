@@ -7,8 +7,8 @@ import {
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
   Request,
@@ -92,7 +92,7 @@ export class UserController {
     return this.userService.banUser(+userId, data);
   }
 
-  @Put('/update-info')
+  @Patch('/update-info')
   @decoratorsUpdateInfo()
   putUpdateInfo(
     @Req() request: IRequestWithDecodedAccessToken,
@@ -102,7 +102,7 @@ export class UserController {
     return this.userService.updateInfo(decodedAccessToken, userInfo);
   }
 
-  @Put('/update-info/:id')
+  @Patch('/update-info/:id')
   @decoratorsUpdateInfoByID()
   putUpdateUser(
     @Param('id') userId: string,
